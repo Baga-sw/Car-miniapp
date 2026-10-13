@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авто Рулетка</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #121214;
+            color: #ffffff;
+            text-align: center;
+            padding: 15px;
+            margin: 0;
+        }
+        .card {
+            background: #1c1c1e;
+            border: 1px solid #3a3a3c;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .btn {
+            background: #007aff;
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+        .btn:disabled { background: #3a3a3c; }
+        .win-title { font-size: 20px; font-weight: bold; color: #32d74b; margin: 10px 0; }
+        .win-price { font-size: 14px; color: #ffd700; }
+    </style>
+</head>
+<body>
+
+    <h2>🚘 Авто-Рулетка</h2>
+    <p style="color:#8e8e93; font-size:14px;">Испытай удачу и выбей редкую тачку!</p>
+
+    <div class="card">
+        <div id="statusText">Нажми кнопку ниже, чтобы скрутить рулетку!</div>
+        <div id="resultBox" style="display:none;">
+            <div class="win-title" id="winTitle">-</div>
+            <div class="win-price" id="winPrice">-</div>
+        </div>
+    </div>
+
+    <button class="btn" id="spinBtn" onclick="spin()">🎰 Крутить Авто (100,000 ₽)</button>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        if (tg) {
+            tg.expand();
+        }
+
+        const cars = [
+            { name: "ВАЗ 2107", price: "150,000 ₽" },
+            { name: "Lada Priora", price: "350,000 ₽" },
+            { name: "ГАЗель NEXT", price: "1,800,000 ₽" },
+            { name: "Toyota Camry 70", price: "2,800,000 ₽" },
+            { name: "BMW M5 F90", price: "9,500,000 ₽" },
+            { name: "Scania R500 (Грузовик)", price: "11,000,000 ₽" }
+        ];
+
+        function spin() {
+            const btn = document.getElementById('spinBtn');
+            const status = document.getElementById('statusText');
+            const resBox = document.getElementById('resultBox');
+            
+            btn.disabled = true;
+            status.innerText = "🌀 Рулетка крутится...";
+            resBox.style.display = "none";
+
+            setTimeout(() => {
+                const winCar = cars[Math.floor(Math.random() * cars.length)];
+                
+                status.innerText = "🎉 ПОЗДРАВЛЯЕМ!";
+                document.getElementById('winTitle').innerText = winCar.name;
+                document.getElementById('winPrice').innerText = "Цена: " + winCar.price;
+                resBox.style.display = "block";
+                btn.disabled = false;
+
+                if (tg && tg.sendData) {
+                    tg.sendData(JSON.stringify(winCar));
+                }
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
