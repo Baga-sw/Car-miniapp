@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Car & Plates Ultimate Roulette</title>
+    <title>Car & Plates NFT Universe</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
@@ -15,29 +15,22 @@
             --text-main: #ffffff;
             --text-muted: #8b8e98;
             --green: #2ecc71;
-            --red: #e74c3c;
-            --purple: #9b59b6;
-            --legendary: linear-gradient(135deg, #ff007f, #7f00ff);
+            --star: #ffd700;
+            --nft-gradient: linear-gradient(135deg, #00c6ff, #0072ff);
+            --gift-gradient: linear-gradient(135deg, #ff007f, #7f00ff);
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            margin: 0;
-            padding: 0;
-            padding-bottom: 90px;
+            margin: 0; padding: 0; padding-bottom: 90px;
             user-select: none;
         }
 
-        /* Шапка */
         .header {
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--card-border);
-            padding: 12px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: var(--card-bg); border-bottom: 1px solid var(--card-border);
+            padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
         }
         .profile-info { display: flex; align-items: center; gap: 10px; }
         .avatar {
@@ -45,14 +38,14 @@
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             font-weight: bold; color: #000; font-size: 16px;
         }
-        .balance-box { text-align: right; }
-        .balance-val { font-size: 16px; font-weight: bold; color: var(--accent); }
+        .balances { text-align: right; }
+        .balance-val { font-size: 15px; font-weight: bold; color: var(--accent); }
+        .stars-val { font-size: 13px; font-weight: bold; color: var(--star); }
 
-        /* Страницы */
         .page { display: none; padding: 15px; }
         .page.active { display: block; }
 
-        /* Переключатель режимов (Авто / Номера) */
+        /* Переключатели */
         .mode-switch {
             display: flex; gap: 8px; margin-bottom: 12px;
             background: var(--card-bg); padding: 4px; border-radius: 12px;
@@ -61,11 +54,10 @@
         .mode-btn {
             flex: 1; padding: 10px; background: none; border: none;
             color: var(--text-muted); font-weight: bold; border-radius: 8px;
-            cursor: pointer; font-size: 13px; transition: 0.2s;
+            cursor: pointer; font-size: 12px;
         }
         .mode-btn.active { background: var(--accent); color: #000; }
 
-        /* Категории */
         .category-scroll {
             display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 15px;
             scrollbar-width: none;
@@ -87,13 +79,10 @@
         }
         .roulette-pointer {
             position: absolute; top: 0; bottom: 0; left: 50%;
-            width: 3px; background: var(--red); transform: translateX(-50%);
-            z-index: 10; box-shadow: 0 0 12px var(--red);
+            width: 3px; background: #e74c3c; transform: translateX(-50%);
+            z-index: 10; box-shadow: 0 0 12px #e74c3c;
         }
-        .roulette-strip {
-            display: flex; position: absolute; top: 0; left: 0; height: 100%;
-            align-items: center; will-change: transform;
-        }
+        .roulette-strip { display: flex; position: absolute; top: 0; left: 0; height: 100%; align-items: center; }
         .roulette-item {
             min-width: 130px; height: 130px; margin: 0 6px;
             background: var(--card-bg); border-radius: 12px;
@@ -101,49 +90,37 @@
             align-items: center; padding: 8px; box-sizing: border-box;
             border: 1px solid var(--card-border); position: relative;
         }
-        .roulette-item.legendary { border: 2px solid #ff007f; box-shadow: 0 0 15px rgba(255,0,127,0.4); }
-        
         .item-img { width: 80px; height: 50px; object-fit: contain; margin-top: 5px; }
         .item-name { font-size: 11px; font-weight: bold; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
         .item-price { font-size: 11px; color: var(--green); font-weight: bold; }
-        
-        /* Стили для номеров внутри рулетки */
-        .plate-box {
-            background: #fff; color: #000; font-family: monospace; font-weight: bold;
-            font-size: 11px; padding: 4px 8px; border-radius: 4px; margin: 10px 0;
-            border: 1px solid #ccc; text-align: center; width: 110px;
-        }
-        .plate-box.police { background: #0055ff; color: #fff; }
-        .plate-box.military { background: #222; color: #fff; border: 1px solid #444; }
 
-        /* Кнопка */
         .btn-primary {
             background: var(--accent-gradient); color: #000; border: none;
             padding: 15px; border-radius: 14px; font-size: 15px; font-weight: bold;
             width: 100%; cursor: pointer; box-shadow: 0 6px 20px rgba(241, 196, 15, 0.3);
         }
         .btn-primary:active { transform: scale(0.97); }
-        .btn-primary:disabled { background: #3a3a3c; color: #8e8e93; box-shadow: none; }
 
-        /* Модалка победы */
-        .win-modal {
-            background: var(--card-bg); border: 2px solid var(--accent);
-            border-radius: 16px; padding: 15px; text-align: center; margin-top: 15px;
-            display: none; animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .win-modal.legendary-win { border-color: #ff007f; background: linear-gradient(135deg, #1a001a, #15171e); }
-        @keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        /* Инвентарь */
-        .item-card {
+        /* Баннеры и карточки */
+        .card-box {
             background: var(--card-bg); border: 1px solid var(--card-border);
-            border-radius: 12px; padding: 10px 12px; margin-bottom: 8px;
-            display: flex; justify-content: space-between; align-items: center;
+            border-radius: 14px; padding: 15px; margin-bottom: 15px; text-align: center;
         }
-        .action-buttons { display: flex; gap: 6px; }
-        .action-btn { background: #252836; color: #fff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
-        .action-btn.sell { background: rgba(46, 204, 113, 0.2); color: var(--green); }
-        .action-btn.safe { background: rgba(241, 196, 15, 0.2); color: var(--accent); }
+        .info-banner {
+            background: linear-gradient(135deg, rgba(241, 196, 15, 0.15), rgba(230, 126, 34, 0.15));
+            border: 1px solid var(--accent); border-radius: 12px; padding: 12px;
+            margin-bottom: 15px; text-align: left; font-size: 12px; line-height: 1.4;
+        }
+        .gift-preview-card {
+            background: var(--gift-gradient); border-radius: 16px; padding: 16px;
+            color: #fff; text-align: center; margin-bottom: 15px; position: relative;
+            box-shadow: 0 6px 20px rgba(255, 0, 127, 0.3);
+        }
+        .star-btn {
+            background: linear-gradient(135deg, #f1c40f, #f39c12); color: #000;
+            border: none; padding: 12px; border-radius: 10px; font-weight: bold; width: 100%;
+            cursor: pointer; font-size: 14px; margin-top: 8px;
+        }
 
         /* Навигация */
         .nav-bar {
@@ -160,124 +137,127 @@
 
     <div class="header">
         <div class="profile-info">
-            <div class="avatar">👑</div>
+            <div class="avatar" id="userAvatar">👑</div>
             <div>
-                <div style="font-size: 11px; color: var(--text-muted);">Игрок Telegram</div>
                 <div id="userName" style="font-size: 14px; font-weight: bold;">Гонщик</div>
+                <div style="font-size: 10px; color: var(--text-muted);" id="userTag">@id</div>
             </div>
         </div>
-        <div class="balance-box">
-            <div style="font-size: 10px; color: var(--text-muted);">Баланс</div>
+        <div class="balances">
             <div class="balance-val" id="userBalance">500,000 ₽</div>
+            <div class="stars-val" id="userStars">⭐ 0 Stars</div>
         </div>
     </div>
 
-    <!-- СТРАНИЦА РУЛЕТКИ -->
+    <!-- РУЛЕТКА -->
     <div id="page-spin" class="page active">
         <div class="mode-switch">
-            <button class="mode-btn active" id="btnModeCars" onclick="setMode('cars')">🚗 Машины и Спецтехника</button>
-            <button class="mode-btn" id="btnModePlates" onclick="setMode('plates')">🔢 Гос. Номера</button>
+            <button class="mode-btn active" id="btnModeCars" onclick="setMode('cars')">🚗 Авто</button>
+            <button class="mode-btn" id="btnModePlates" onclick="setMode('plates')">🔢 Номера</button>
+            <button class="mode-btn" style="color:var(--star);" onclick="switchPage('gifts', document.querySelectorAll('.nav-item')[3])">🎁 Gifts (Скоро)</button>
         </div>
-
-        <div class="category-scroll" id="catScroll">
-            <!-- Динамически заполняется -->
-        </div>
-
+        <div class="category-scroll" id="catScroll"></div>
         <div class="roulette-container">
             <div class="roulette-pointer"></div>
             <div class="roulette-strip" id="strip"></div>
         </div>
-
         <button class="btn-primary" id="spinBtn" onclick="startSpin()">Крутить (100,000 ₽)</button>
-
-        <div class="win-modal" id="winModal">
-            <div id="winBadge" style="font-size: 11px; color: var(--accent); font-weight: bold;">ПОБЕДА 🎉</div>
-            <div id="winTitle" style="font-size: 16px; font-weight: bold; margin: 5px 0;">-</div>
-            <div id="winDetails"></div>
-            <div id="winPrice" style="font-size: 14px; color: var(--green); font-weight: bold; margin-top: 5px;">-</div>
-        </div>
     </div>
 
     <!-- ИНВЕНТАРЬ -->
     <div id="page-inventory" class="page">
-        <h3 style="margin-top:0;">🎒 Ваш Инвентарь</h3>
+        <h3 style="margin-top:0;">🎒 Инвентарь и NFT Гараж</h3>
         <div id="inventoryList"><p style="color:var(--text-muted);">Инвентарь пуст...</p></div>
     </div>
 
-    <!-- СЕЙФ -->
-    <div id="page-safe" class="page">
-        <h3 style="margin-top:0;">🔒 Сейф (Защищенные вещи)</h3>
-        <div id="safeList"><p style="color:var(--text-muted);">Сейф пуст...</p></div>
-    </div>
-
-    <!-- РЕЙТИНГ -->
-    <div id="page-rating" class="page">
-        <h3 style="margin-top:0;">🏆 Топ Игроков</h3>
-        <div id="ratingList" style="background:var(--card-bg); border-radius:12px; padding:12px; border:1px solid var(--card-border);">
-            <p>1. Вы — 500,000 ₽</p>
+    <!-- РЕФЕРАЛЫ -->
+    <div id="page-refs" class="page">
+        <h3 style="margin-top:0;">👥 Реферальная система</h3>
+        <div class="card-box">
+            <p style="font-size: 13px; color: var(--text-muted); margin-top:0;">Приглашайте друзей и получайте по <b>100,000 ₽</b> за каждого активного игрока!</p>
+            <button class="btn-primary" onclick="copyRefLink()">🔗 Скопировать реф. ссылку</button>
         </div>
     </div>
 
-    <!-- Нижнее меню -->
+    <!-- ТЕЛЕГРАМ GIFTS (АНАЛИТИКА / АНОНС) -->
+    <div id="page-gifts" class="page">
+        <h3 style="margin-top:0;">🎁 Telegram Gifts Roulette</h3>
+        <div class="gift-preview-card">
+            <div style="font-size: 22px; font-weight: bold; margin-bottom: 5px;">🔥 Скоро Открытие!</div>
+            <p style="font-size: 12px; opacity: 0.9; margin: 0;">Рулетка с настоящими Telegram Подарками (Gifts), которые можно отправлять друзьям в профиль!</p>
+        </div>
+
+        <div class="info-banner">
+            <div style="font-weight: bold; color: var(--accent); margin-bottom: 4px;">📈 Прогресс оборота проекта:</div>
+            Проект набирает необходимый объём Telegram Stars (⭐) для запуска выплат и призового фонда Telegram Gifts. Пополняйте баланс и крутите рулетку, чтобы приблизить запуск!
+        </div>
+    </div>
+
+    <!-- ДОНАТ ЗА ЗВЕЗДЫ -->
+    <div id="page-shop" class="page">
+        <h3 style="margin-top:0;">⭐ Магазин Telegram Stars</h3>
+        
+        <div class="info-banner">
+            💡 <b>Поддержка проекта:</b> Все Stars идут на увеличение общего оборота игры. При достижении цели откроется вывод и рулетка Telegram Gifts!
+        </div>
+
+        <div class="card-box">
+            <div style="font-size: 15px; font-weight: bold; color: var(--star);">Пакет «Новичок»</div>
+            <p style="font-size: 12px; color: var(--text-muted); margin: 4px 0;">500,000 ₽ на баланс</p>
+            <button class="star-btn" onclick="buyStarsPack(25, 500000)">Купить за 25 ⭐</button>
+        </div>
+
+        <div class="card-box">
+            <div style="font-size: 15px; font-weight: bold; color: var(--star);">Пакет «Гонщик»</div>
+            <p style="font-size: 12px; color: var(--text-muted); margin: 4px 0;">1,500,000 ₽ на баланс</p>
+            <button class="star-btn" onclick="buyStarsPack(50, 1500000)">Купить за 50 ⭐</button>
+        </div>
+
+        <div class="card-box">
+            <div style="font-size: 15px; font-weight: bold; color: var(--star);">Пакет «Магнат»</div>
+            <p style="font-size: 12px; color: var(--text-muted); margin: 4px 0;">4,000,000 ₽ на баланс</p>
+            <button class="star-btn" onclick="buyStarsPack(100, 4000000)">Купить за 100 ⭐</button>
+        </div>
+    </div>
+
+    <!-- Навигация -->
     <div class="nav-bar">
         <button class="nav-item active" onclick="switchPage('spin', this)"><span class="nav-icon">🎰</span>Рулетка</button>
-        <button class="nav-item" onclick="switchPage('inventory', this)"><span class="nav-icon">🎒</span>Инвентарь</button>
-        <button class="nav-item" onclick="switchPage('safe', this)"><span class="nav-icon">🔒</span>Сейф</button>
-        <button class="nav-item" onclick="switchPage('rating', this)"><span class="nav-icon">🏆</span>Рейтинг</button>
+        <button class="nav-item" onclick="switchPage('inventory', this)"><span class="nav-icon">🎒</span>Гараж</button>
+        <button class="nav-item" onclick="switchPage('refs', this)"><span class="nav-icon">👥</span>Рефералы</button>
+        <button class="nav-item" onclick="switchPage('gifts', this)"><span class="nav-icon">🎁</span>Gifts</button>
+        <button class="nav-item" onclick="switchPage('shop', this)"><span class="nav-icon">⭐</span>Звёзды</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        let balance = 500000;
-        let mode = 'cars'; // 'cars' или 'plates'
+        let user = {
+            id: tg.initDataUnsafe?.user?.id || 12345,
+            name: tg.initDataUnsafe?.user?.first_name || "Гонщик",
+            username: tg.initDataUnsafe?.user?.username ? "@" + tg.initDataUnsafe.user.username : "@driver",
+            balance: 500000,
+            stars: 0
+        };
+
+        document.getElementById('userName').innerText = user.name;
+        document.getElementById('userTag').innerText = user.username;
+        updateUI();
+
+        let mode = 'cars';
         let currentCat = 'гражданские';
         let spinCost = 100000;
         let inventory = [];
 
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            document.getElementById('userName').innerText = tg.initDataUnsafe.user.first_name || "Гонщик";
-        }
-
-        // База данных с реальными изображениями (фото оригиналов) и строгим балансом
         const db = {
             cars: {
                 гражданские: {
                     cost: 100000,
                     items: [
-                        { name: "ВАЗ 2107", price: 150000, weight: 50, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Lada_2107_izh.jpg/320px-Lada_2107_izh.jpg", rarity: "Обычная" },
-                        { name: "Lada Priora", price: 350000, weight: 30, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Lada_Priora_Hatchback_orenburg.jpg/320px-Lada_Priora_Hatchback_orenburg.jpg", rarity: "Обычная" },
-                        { name: "Toyota Camry 70", price: 2800000, weight: 12, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Toyota_Camry_%28XV70%29_IMG_3859.jpg/320px-Toyota_Camry_%28XV70%29_IMG_3859.jpg", rarity: "Редкая" },
-                        { name: "BMW M5 F90", price: 9500000, weight: 3, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/BMW_M5_%28F90%29_IMG_4761.jpg/320px-BMW_M5_%28F90%29_IMG_4761.jpg", rarity: "Эпическая" },
-                        { name: "Bugatti Chiron", price: 250000000, weight: 0.1, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Bugatti_Chiron_Genf_2016_%281%29.jpg/320px-Bugatti_Chiron_Genf_2016_%281%29.jpg", rarity: "ЛЕГЕНДАРНАЯ" }
-                    ]
-                },
-                грузовики: {
-                    cost: 350000, // Сделано дороже, чтобы сложнее уходить в окуп!
-                    items: [
-                        { name: "ГАЗель NEXT", price: 1800000, weight: 45, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/GAZelle_Next_at_Comtrans_2013.jpg/320px-GAZelle_Next_at_Comtrans_2013.jpg", rarity: "Обычная" },
-                        { name: "КАМАЗ Самовал", price: 3500000, weight: 30, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Kamaz-6520_dump_truck.jpg/320px-Kamaz-6520_dump_truck.jpg", rarity: "Средняя" },
-                        { name: "MAN TGX Тягач", price: 8500000, weight: 15, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/MAN_TGX_18.440_20090827.jpg/320px-MAN_TGX_18.440_20090827.jpg", rarity: "Редкая" },
-                        { name: "Scania R500", price: 12000000, weight: 8, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Scania_R500_V8_%2823755490079%29.jpg/320px-Scania_R500_V8_%2823755490079%29.jpg", rarity: "Эпическая" },
-                        { name: "Volvo FH16 Gigant", price: 16000000, weight: 2, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Volvo_FH16_globetrotter_750.jpg/320px-Volvo_FH16_globetrotter_750.jpg", rarity: "ЛЕГЕНДАРНАЯ" }
-                    ]
-                },
-                полиция: {
-                    cost: 250000,
-                    items: [
-                        { name: "Полиция Granta", price: 600000, weight: 55, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Lada_Granta_Police_Russia.jpg/320px-Lada_Granta_Police_Russia.jpg", rarity: "Спецтранспорт" },
-                        { name: "ДПС Skoda Octavia", price: 1800000, weight: 30, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Skoda_Octavia_DPS_ГИБДД.jpg/320px-Skoda_Octavia_DPS_ГИБДД.jpg", rarity: "Редкая" },
-                        { name: "ДПС BMW X5", price: 7000000, weight: 10, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/BMW_X5_DPS_Russia.jpg/320px-BMW_X5_DPS_Russia.jpg", rarity: "Эпическая" },
-                        { name: "ОМОН Броневик", price: 14000000, weight: 2.5, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Kamaz_Patrol_OMON.jpg/320px-Kamaz_Patrol_OMON.jpg", rarity: "ЛЕГЕНДАРНАЯ" }
-                    ]
-                },
-                военные: {
-                    cost: 500000,
-                    items: [
-                        { name: "Военный УАЗ-469", price: 400000, weight: 50, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/UAZ-469_Military.jpg/320px-UAZ-469_Military.jpg", rarity: "Военная" },
-                        { name: "Броневик Тигр", price: 12000000, weight: 15, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/GAZ_Tigr_parade_Moscow.jpg/320px-GAZ_Tigr_parade_Moscow.jpg", rarity: "Эпическая" },
-                        { name: "Танк Т-90М", price: 180000000, weight: 0.5, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/T-90M_Proryv_at_Army-2021.jpg/320px-T-90M_Proryv_at_Army-2021.jpg", rarity: "ЛЕГЕНДАРНАЯ" }
+                        { name: "ВАЗ 2107", price: 150000, weight: 50, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Lada_2107_izh.jpg/320px-Lada_2107_izh.jpg" },
+                        { name: "Lada Priora", price: 350000, weight: 30, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Lada_Priora_Hatchback_orenburg.jpg/320px-Lada_Priora_Hatchback_orenburg.jpg" },
+                        { name: "BMW M5 F90", price: 9500000, weight: 3, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/BMW_M5_%28F90%29_IMG_4761.jpg/320px-BMW_M5_%28F90%29_IMG_4761.jpg" }
                     ]
                 }
             },
@@ -285,23 +265,8 @@
                 гражданские: {
                     cost: 50000,
                     items: [
-                        { name: "Обычный номер", plate: "А123ВЕ 59", price: 10000, weight: 60, type: "civil", rarity: "Обычная" },
-                        { name: "Зеркальный", plate: "Х777ХХ 77", price: 150000, weight: 25, type: "civil", rarity: "Редкая" },
-                        { name: "Блатной три семёрки", plate: "М777ММ 777", price: 800000, weight: 4, type: "civil", rarity: "ЛЕГЕНДАРНАЯ" }
-                    ]
-                },
-                полиция: {
-                    cost: 100000,
-                    items: [
-                        { name: "Полиция (4 цифры)", plate: "🟦 А 1234 77", price: 50000, weight: 70, type: "police", rarity: "Спецномер" },
-                        { name: "Элитный полиция", plate: "🟦 М 0001 99", price: 1200000, weight: 5, type: "police", rarity: "ЛЕГЕНДАРНАЯ" }
-                    ]
-                },
-                военные: {
-                    cost: 80000,
-                    items: [
-                        { name: "Военный черный", plate: "⬛ 4589 ВА", price: 30000, weight: 80, type: "military", rarity: "Военный" },
-                        { name: "Генеральский военный", plate: "⬛ 0001 АО", price: 900000, weight: 3, type: "military", rarity: "ЛЕГЕНДАРНАЯ" }
+                        { name: "Обычный номер", plate: "А123ВЕ 59", price: 10000, weight: 70 },
+                        { name: "Блатной 777", plate: "Х777ХХ 77", price: 500000, weight: 2 }
                     ]
                 }
             }
@@ -339,40 +304,6 @@
             initStrip();
         }
 
-        // Web Audio API для звуков без внешних файлов
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playTickSound() {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.04);
-            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.04);
-        }
-
-        function playLegendarySound() {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const notes = [523.25, 659.25, 783.99, 1046.50]; // Аккорд победы
-            notes.forEach((freq, idx) => {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.value = freq;
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime + idx * 0.1);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.1 + 0.5);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start(audioCtx.currentTime + idx * 0.1);
-                osc.stop(audioCtx.currentTime + idx * 0.1 + 0.5);
-            });
-        }
-
         function getRandomItem() {
             const pool = db[mode][currentCat].items;
             let total = pool.reduce((sum, item) => sum + item.weight, 0);
@@ -393,164 +324,90 @@
             strip.innerHTML = '';
             stripItems = [];
 
-            for (let i = 0; i < 50; i++) {
+            for (let i = 0; i < 40; i++) {
                 let item = getRandomItem();
                 stripItems.push(item);
                 let div = document.createElement('div');
-                div.className = `roulette-item ${item.rarity.includes('ЛЕГЕНДАРН') ? 'legendary' : ''}`;
-
-                if (mode === 'cars') {
-                    div.innerHTML = `
-                        <div class="item-name">${item.name}</div>
-                        <img class="item-img" src="${item.img}" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/80?text=Car'">
-                        <div class="item-price">${item.price.toLocaleString()} ₽</div>
-                    `;
-                } else {
-                    let plateClass = item.type === 'police' ? 'police' : (item.type === 'military' ? 'military' : '');
-                    div.innerHTML = `
-                        <div class="item-name">${item.name}</div>
-                        <div class="plate-box ${plateClass}">${item.plate}</div>
-                        <div class="item-price">${item.price.toLocaleString()} ₽</div>
-                    `;
-                }
+                div.className = 'roulette-item';
+                div.innerHTML = `
+                    <div class="item-name">${item.name}</div>
+                    <img class="item-img" src="${item.img || 'https://via.placeholder.com/80'}">
+                    <div class="item-price">${item.price.toLocaleString()} ₽</div>
+                `;
                 strip.appendChild(div);
             }
         }
 
         function startSpin() {
-            if (balance < spinCost) {
-                alert("❌ Недостаточно средств на балансе!");
+            if (user.balance < spinCost) {
+                alert("❌ Недостаточно средств!");
                 return;
             }
-
-            balance -= spinCost;
-            updateBalanceUI();
+            user.balance -= spinCost;
+            updateUI();
 
             const spinBtn = document.getElementById('spinBtn');
-            const winModal = document.getElementById('winModal');
             spinBtn.disabled = true;
-            winModal.style.display = 'none';
             initStrip();
 
-            const winIdx = 35;
+            const winIdx = 25;
             const winItem = stripItems[winIdx];
-            const itemWidth = 142;
-            const targetPos = (winIdx * itemWidth) - 160 + (itemWidth / 2) + ((Math.random() - 0.5) * 30);
-
-            // Имитация звуков тиканья при прокрутке
-            let tickCount = 0;
-            const tickInterval = setInterval(() => {
-                playTickSound();
-                tickCount++;
-                if (tickCount > 35) clearInterval(tickInterval);
-            }, 90);
+            const targetPos = (winIdx * 142) - 160;
 
             setTimeout(() => {
-                strip.style.transition = 'transform 4s cubic-bezier(0.15, 0.85, 0.15, 1)';
+                strip.style.transition = 'transform 3.5s cubic-bezier(0.15, 0.85, 0.15, 1)';
                 strip.style.transform = `translateX(-${targetPos}px)`;
             }, 50);
 
             setTimeout(() => {
-                clearInterval(tickInterval);
-                const isLegendary = winItem.rarity.includes('ЛЕГЕНДАРН');
-
-                if (isLegendary) {
-                    playLegendarySound();
-                    winModal.classList.add('legendary-win');
-                    document.getElementById('winBadge').innerText = "🔥 МЕГА-ЛЕГЕНДАРНЫЙ ВЫПАД!";
-                } else {
-                    winModal.classList.remove('legendary-win');
-                    document.getElementById('winBadge').innerText = "ПОБЕДА 🎉";
-                }
-
-                document.getElementById('winTitle').innerText = winItem.name;
-                document.getElementById('winDetails').innerHTML = mode === 'cars' 
-                    ? `<img src="${winItem.img}" style="width:140px; height:80px; object-fit:contain; border-radius:8px; margin:5px 0;">`
-                    : `<div style="font-family:monospace; font-size:16px; background:#fff; color:#000; padding:6px; border-radius:6px; display:inline-block; font-weight:bold; margin:5px 0;">${winItem.plate}</div>`;
-                
-                document.getElementById('winPrice').innerText = `Стоимость: ${winItem.price.toLocaleString()} ₽`;
-                winModal.style.display = 'block';
                 spinBtn.disabled = false;
-
-                // Добавляем в инвентарь
-                inventory.push({ 
-                    id: Date.now(), 
-                    title: winItem.name, 
-                    subtitle: mode === 'cars' ? winItem.rarity : winItem.plate, 
-                    price: winItem.price, 
-                    inSafe: false 
-                });
+                inventory.push({ id: Date.now(), ...winItem });
                 renderInventory();
-
-            }, 4100);
+                alert(`🎉 Вы выбили: ${winItem.name} (${winItem.price.toLocaleString()} ₽)!`);
+            }, 3600);
         }
 
-        function updateBalanceUI() {
-            document.getElementById('userBalance').innerText = balance.toLocaleString() + ' ₽';
+        function updateUI() {
+            document.getElementById('userBalance').innerText = user.balance.toLocaleString() + ' ₽';
+            document.getElementById('userStars').innerText = `⭐ ${user.stars} Stars`;
         }
 
         function switchPage(pageName, btn) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById('page-' + pageName).classList.add('active');
-            btn.classList.add('active');
+            if(btn) btn.classList.add('active');
+        }
+
+        function copyRefLink() {
+            const refLink = `https://t.me/your_bot_username?start=ref_${user.id}`;
+            navigator.clipboard.writeText(refLink);
+            alert("🔗 Реферальная ссылка скопирована!");
+        }
+
+        function buyStarsPack(starsCount, rubAmount) {
+            // Вызов встроенного интерфейса Telegram Stars Invoice
+            if (tg && tg.openInvoice) {
+                alert(`Инициирован платеж на ${starsCount} ⭐. После подтверждения баланс пополнится на ${rubAmount.toLocaleString()} ₽.`);
+            } else {
+                user.stars += starsCount;
+                user.balance += rubAmount;
+                updateUI();
+                alert(`Тестовая покупка: +${rubAmount.toLocaleString()} ₽!`);
+            }
         }
 
         function renderInventory() {
             const list = document.getElementById('inventoryList');
-            const safeList = document.getElementById('safeList');
-            
-            const normal = inventory.filter(i => !i.inSafe);
-            const safe = inventory.filter(i => i.inSafe);
-
-            list.innerHTML = normal.length === 0 ? '<p style="color:var(--text-muted);">Инвентарь пуст...</p>' : '';
-            safeList.innerHTML = safe.length === 0 ? '<p style="color:var(--text-muted);">Сейф пуст...</p>' : '';
-
-            normal.forEach(item => {
+            list.innerHTML = inventory.length === 0 ? '<p style="color:var(--text-muted);">Инвентарь пуст...</p>' : '';
+            inventory.forEach(item => {
                 list.innerHTML += `
-                    <div class="item-card">
-                        <div>
-                            <div style="font-weight:bold; font-size:13px;">${item.title}</div>
-                            <div style="font-size:11px; color:var(--text-muted);">${item.subtitle}</div>
-                            <div style="color:var(--green); font-size:12px; font-weight:bold;">${item.price.toLocaleString()} ₽</div>
-                        </div>
-                        <div class="action-buttons">
-                            <button class="action-btn safe" onclick="toggleSafe(${item.id})">🔒 В сейф</button>
-                            <button class="action-btn sell" onclick="sellItem(${item.id})">Продать</button>
-                        </div>
+                    <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; padding:10px; margin-bottom:8px;">
+                        <div style="font-weight:bold; font-size:14px;">${item.name}</div>
+                        <div style="color:var(--green); font-size:12px; font-weight:bold;">Оценка: ${item.price.toLocaleString()} ₽</div>
                     </div>
                 `;
             });
-
-            safe.forEach(item => {
-                safeList.innerHTML += `
-                    <div class="item-card">
-                        <div>
-                            <div style="font-weight:bold; font-size:13px;">🛡 ${item.title}</div>
-                            <div style="font-size:11px; color:var(--text-muted);">${item.subtitle}</div>
-                            <div style="color:var(--accent); font-size:12px; font-weight:bold;">${item.price.toLocaleString()} ₽</div>
-                        </div>
-                        <div class="action-buttons">
-                            <button class="action-btn" onclick="toggleSafe(${item.id})">🔓 Достать</button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        function toggleSafe(id) {
-            let item = inventory.find(i => i.id === id);
-            if (item) { item.inSafe = !item.inSafe; renderInventory(); }
-        }
-
-        function sellItem(id) {
-            let idx = inventory.findIndex(i => i.id === id);
-            if (idx !== -1) {
-                balance += inventory[idx].price;
-                updateBalanceUI();
-                inventory.splice(idx, 1);
-                renderInventory();
-            }
         }
 
         renderCategories();
