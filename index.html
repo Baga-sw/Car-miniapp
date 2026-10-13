@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Car & Plates NFT Universe</title>
+    <title>Car & Plates Market Universe</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
@@ -16,16 +16,12 @@
             --text-muted: #8b8e98;
             --green: #2ecc71;
             --star: #ffd700;
-            --nft-gradient: linear-gradient(135deg, #00c6ff, #0072ff);
-            --gift-gradient: linear-gradient(135deg, #ff007f, #7f00ff);
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0; padding: 0; padding-bottom: 90px;
-            user-select: none;
+            background-color: var(--bg-color); color: var(--text-main);
+            margin: 0; padding: 0; padding-bottom: 90px; user-select: none;
         }
 
         .header {
@@ -45,30 +41,18 @@
         .page { display: none; padding: 15px; }
         .page.active { display: block; }
 
-        /* Переключатели */
+        /* Табы видов номеров и авто */
         .mode-switch {
-            display: flex; gap: 8px; margin-bottom: 12px;
+            display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto;
             background: var(--card-bg); padding: 4px; border-radius: 12px;
-            border: 1px solid var(--card-border);
+            border: 1px solid var(--card-border); scrollbar-width: none;
         }
         .mode-btn {
-            flex: 1; padding: 10px; background: none; border: none;
+            flex: 1; padding: 8px 12px; background: none; border: none;
             color: var(--text-muted); font-weight: bold; border-radius: 8px;
-            cursor: pointer; font-size: 12px;
+            cursor: pointer; font-size: 12px; white-space: nowrap;
         }
         .mode-btn.active { background: var(--accent); color: #000; }
-
-        .category-scroll {
-            display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 15px;
-            scrollbar-width: none;
-        }
-        .category-scroll::-webkit-scrollbar { display: none; }
-        .cat-chip {
-            background: var(--card-bg); border: 1px solid var(--card-border);
-            color: var(--text-muted); padding: 6px 12px; border-radius: 16px;
-            font-size: 12px; white-space: nowrap; cursor: pointer; font-weight: 600;
-        }
-        .cat-chip.active { background: var(--text-main); color: #000; border-color: var(--text-main); }
 
         /* Рулетка */
         .roulette-container {
@@ -84,43 +68,38 @@
         }
         .roulette-strip { display: flex; position: absolute; top: 0; left: 0; height: 100%; align-items: center; }
         .roulette-item {
-            min-width: 130px; height: 130px; margin: 0 6px;
+            min-width: 140px; height: 130px; margin: 0 6px;
             background: var(--card-bg); border-radius: 12px;
             display: flex; flex-direction: column; justify-content: space-between;
             align-items: center; padding: 8px; box-sizing: border-box;
-            border: 1px solid var(--card-border); position: relative;
+            border: 1px solid var(--card-border);
         }
-        .item-img { width: 80px; height: 50px; object-fit: contain; margin-top: 5px; }
-        .item-name { font-size: 11px; font-weight: bold; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
-        .item-price { font-size: 11px; color: var(--green); font-weight: bold; }
+
+        /* Генератор гос. номера с реалистичными стилями */
+        .plate-ui {
+            background: #fff; color: #000; border: 2px solid #000; border-radius: 5px;
+            padding: 3px 8px; font-family: 'Courier New', monospace; font-weight: bold;
+            font-size: 13px; display: inline-flex; align-items: center; gap: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5); letter-spacing: 1px;
+        }
+        .plate-ui.taxi { background: #ffcc00; color: #000; border-color: #000; }
+        .plate-ui.police { background: #0055ff; color: #fff; border-color: #fff; }
+        .plate-ui.military { background: #1a1a1a; color: #fff; border-color: #333; }
+        .plate-ui .flag-box { border-left: 1px solid #000; padding-left: 4px; font-size: 10px; text-align: center; }
 
         .btn-primary {
             background: var(--accent-gradient); color: #000; border: none;
             padding: 15px; border-radius: 14px; font-size: 15px; font-weight: bold;
             width: 100%; cursor: pointer; box-shadow: 0 6px 20px rgba(241, 196, 15, 0.3);
         }
-        .btn-primary:active { transform: scale(0.97); }
 
-        /* Баннеры и карточки */
-        .card-box {
+        /* Маркетплейс карточки */
+        .market-card {
             background: var(--card-bg); border: 1px solid var(--card-border);
-            border-radius: 14px; padding: 15px; margin-bottom: 15px; text-align: center;
+            border-radius: 14px; padding: 12px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .info-banner {
-            background: linear-gradient(135deg, rgba(241, 196, 15, 0.15), rgba(230, 126, 34, 0.15));
-            border: 1px solid var(--accent); border-radius: 12px; padding: 12px;
-            margin-bottom: 15px; text-align: left; font-size: 12px; line-height: 1.4;
-        }
-        .gift-preview-card {
-            background: var(--gift-gradient); border-radius: 16px; padding: 16px;
-            color: #fff; text-align: center; margin-bottom: 15px; position: relative;
-            box-shadow: 0 6px 20px rgba(255, 0, 127, 0.3);
-        }
-        .star-btn {
-            background: linear-gradient(135deg, #f1c40f, #f39c12); color: #000;
-            border: none; padding: 12px; border-radius: 10px; font-weight: bold; width: 100%;
-            cursor: pointer; font-size: 14px; margin-top: 8px;
-        }
+        .star-price { color: var(--star); font-weight: bold; font-size: 14px; }
 
         /* Навигация */
         .nav-bar {
@@ -130,7 +109,6 @@
         }
         .nav-item { background: none; border: none; color: var(--text-muted); font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
         .nav-item.active { color: var(--accent); }
-        .nav-icon { font-size: 18px; }
     </style>
 </head>
 <body>
@@ -140,179 +118,105 @@
             <div class="avatar" id="userAvatar">👑</div>
             <div>
                 <div id="userName" style="font-size: 14px; font-weight: bold;">Гонщик</div>
-                <div style="font-size: 10px; color: var(--text-muted);" id="userTag">@id</div>
             </div>
         </div>
         <div class="balances">
             <div class="balance-val" id="userBalance">500,000 ₽</div>
-            <div class="stars-val" id="userStars">⭐ 0 Stars</div>
+            <div class="stars-val" id="userStars">⭐ 10 Stars</div>
         </div>
     </div>
 
     <!-- РУЛЕТКА -->
     <div id="page-spin" class="page active">
         <div class="mode-switch">
-            <button class="mode-btn active" id="btnModeCars" onclick="setMode('cars')">🚗 Авто</button>
-            <button class="mode-btn" id="btnModePlates" onclick="setMode('plates')">🔢 Номера</button>
-            <button class="mode-btn" style="color:var(--star);" onclick="switchPage('gifts', document.querySelectorAll('.nav-item')[3])">🎁 Gifts (Скоро)</button>
+            <button class="mode-btn active" onclick="setMode('cars')">🚗 Автомобили</button>
+            <button class="mode-btn" onclick="setMode('civil_plates')">⚪ Гражданские</button>
+            <button class="mode-btn" onclick="setMode('taxi_plates')">🟡 Такси</button>
+            <button class="mode-btn" onclick="setMode('police_plates')">🔵 Полиция</button>
+            <button class="mode-btn" onclick="setMode('military_plates')">⚫ Военные</button>
         </div>
-        <div class="category-scroll" id="catScroll"></div>
+
         <div class="roulette-container">
             <div class="roulette-pointer"></div>
             <div class="roulette-strip" id="strip"></div>
         </div>
+
         <button class="btn-primary" id="spinBtn" onclick="startSpin()">Крутить (100,000 ₽)</button>
+
+        <!-- АНИМАЦИЯ ВЫПАДЕНИЯ НОМЕРА -->
+        <div id="plateAnimModal" style="display:none; text-align:center; margin-top:15px; background:var(--card-bg); padding:15px; border-radius:14px; border:1px solid var(--accent);">
+            <div style="font-size:12px; color:var(--text-muted);">ГЕНЕРАЦИЯ ГОС. НОМЕРА...</div>
+            <div id="animPlateBox" style="margin:10px 0;"></div>
+            <div id="animPlatePrice" style="color:var(--green); font-weight:bold;"></div>
+        </div>
     </div>
 
     <!-- ИНВЕНТАРЬ -->
     <div id="page-inventory" class="page">
-        <h3 style="margin-top:0;">🎒 Инвентарь и NFT Гараж</h3>
-        <div id="inventoryList"><p style="color:var(--text-muted);">Инвентарь пуст...</p></div>
+        <h3 style="margin-top:0;">🎒 Ваш Гараж и Номера</h3>
+        <div id="inventoryList"></div>
     </div>
 
-    <!-- РЕФЕРАЛЫ -->
-    <div id="page-refs" class="page">
-        <h3 style="margin-top:0;">👥 Реферальная система</h3>
-        <div class="card-box">
-            <p style="font-size: 13px; color: var(--text-muted); margin-top:0;">Приглашайте друзей и получайте по <b>100,000 ₽</b> за каждого активного игрока!</p>
-            <button class="btn-primary" onclick="copyRefLink()">🔗 Скопировать реф. ссылку</button>
-        </div>
-    </div>
-
-    <!-- ТЕЛЕГРАМ GIFTS (АНАЛИТИКА / АНОНС) -->
-    <div id="page-gifts" class="page">
-        <h3 style="margin-top:0;">🎁 Telegram Gifts Roulette</h3>
-        <div class="gift-preview-card">
-            <div style="font-size: 22px; font-weight: bold; margin-bottom: 5px;">🔥 Скоро Открытие!</div>
-            <p style="font-size: 12px; opacity: 0.9; margin: 0;">Рулетка с настоящими Telegram Подарками (Gifts), которые можно отправлять друзьям в профиль!</p>
-        </div>
-
-        <div class="info-banner">
-            <div style="font-weight: bold; color: var(--accent); margin-bottom: 4px;">📈 Прогресс оборота проекта:</div>
-            Проект набирает необходимый объём Telegram Stars (⭐) для запуска выплат и призового фонда Telegram Gifts. Пополняйте баланс и крутите рулетку, чтобы приблизить запуск!
-        </div>
-    </div>
-
-    <!-- ДОНАТ ЗА ЗВЕЗДЫ -->
-    <div id="page-shop" class="page">
-        <h3 style="margin-top:0;">⭐ Магазин Telegram Stars</h3>
-        
-        <div class="info-banner">
-            💡 <b>Поддержка проекта:</b> Все Stars идут на увеличение общего оборота игры. При достижении цели откроется вывод и рулетка Telegram Gifts!
-        </div>
-
-        <div class="card-box">
-            <div style="font-size: 15px; font-weight: bold; color: var(--star);">Пакет «Новичок»</div>
-            <p style="font-size: 12px; color: var(--text-muted); margin: 4px 0;">500,000 ₽ на баланс</p>
-            <button class="star-btn" onclick="buyStarsPack(25, 500000)">Купить за 25 ⭐</button>
-        </div>
-
-        <div class="card-box">
-            <div style="font-size: 15px; font-weight: bold; color: var(--star);">Пакет «Гонщик»</div>
-            <p style="font-size: 12px; color: var(--text-muted); margin: 4px 0;">1,500,000 ₽ на баланс</p>
-            <button class="star-btn" onclick="buyStarsPack(50, 1500000)">Купить за 50 ⭐</button>
-        </div>
-
-        <div class="card-box">
-            <div style="font-size: 15px; font-weight: bold; color: var(--star);">Пакет «Магнат»</div>
-            <p style="font-size: 12px; color: var(--text-muted); margin: 4px 0;">4,000,000 ₽ на баланс</p>
-            <button class="star-btn" onclick="buyStarsPack(100, 4000000)">Купить за 100 ⭐</button>
-        </div>
+    <!-- АВТОРЫНОК (P2P MARKETPLACE) -->
+    <div id="page-market" class="page">
+        <h3 style="margin-top:0;">🏪 Рынок Номеров и Авто (за ⭐)</h3>
+        <p style="font-size:11px; color:var(--text-muted);">Комиссия площадки: 1 ⭐ с продажи забирает Сервер!</p>
+        <div id="marketList"></div>
     </div>
 
     <!-- Навигация -->
     <div class="nav-bar">
-        <button class="nav-item active" onclick="switchPage('spin', this)"><span class="nav-icon">🎰</span>Рулетка</button>
-        <button class="nav-item" onclick="switchPage('inventory', this)"><span class="nav-icon">🎒</span>Гараж</button>
-        <button class="nav-item" onclick="switchPage('refs', this)"><span class="nav-icon">👥</span>Рефералы</button>
-        <button class="nav-item" onclick="switchPage('gifts', this)"><span class="nav-icon">🎁</span>Gifts</button>
-        <button class="nav-item" onclick="switchPage('shop', this)"><span class="nav-icon">⭐</span>Звёзды</button>
+        <button class="nav-item active" onclick="switchPage('spin', this)"><span>🎰</span>Рулетка</button>
+        <button class="nav-item" onclick="switchPage('inventory', this)"><span>🎒</span>Гараж</button>
+        <button class="nav-item" onclick="switchPage('market', this)"><span>🏪</span>Авторынок</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        let user = {
-            id: tg.initDataUnsafe?.user?.id || 12345,
-            name: tg.initDataUnsafe?.user?.first_name || "Гонщик",
-            username: tg.initDataUnsafe?.user?.username ? "@" + tg.initDataUnsafe.user.username : "@driver",
-            balance: 500000,
-            stars: 0
-        };
-
-        document.getElementById('userName').innerText = user.name;
-        document.getElementById('userTag').innerText = user.username;
-        updateUI();
-
+        let user = { balance: 500000, stars: 10 };
         let mode = 'cars';
-        let currentCat = 'гражданские';
-        let spinCost = 100000;
         let inventory = [];
+        
+        // Рынок объявление
+        let marketItems = [
+            { id: 901, seller: "Олигарх", title: "BMW M5 F90", plate: "О777ОО 77", priceStars: 5, type: "car" },
+            { id: 902, seller: "Влад", title: "Красивый номер", plate: "Х777ХХ 159", priceStars: 2, type: "plate" }
+        ];
 
-        const db = {
-            cars: {
-                гражданские: {
-                    cost: 100000,
-                    items: [
-                        { name: "ВАЗ 2107", price: 150000, weight: 50, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Lada_2107_izh.jpg/320px-Lada_2107_izh.jpg" },
-                        { name: "Lada Priora", price: 350000, weight: 30, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Lada_Priora_Hatchback_orenburg.jpg/320px-Lada_Priora_Hatchback_orenburg.jpg" },
-                        { name: "BMW M5 F90", price: 9500000, weight: 3, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/BMW_M5_%28F90%29_IMG_4761.jpg/320px-BMW_M5_%28F90%29_IMG_4761.jpg" }
-                    ]
-                }
-            },
-            plates: {
-                гражданские: {
-                    cost: 50000,
-                    items: [
-                        { name: "Обычный номер", plate: "А123ВЕ 59", price: 10000, weight: 70 },
-                        { name: "Блатной 777", plate: "Х777ХХ 77", price: 500000, weight: 2 }
-                    ]
-                }
+        const letters = "АВЕКМНОРСТУХ";
+        const regions = ["59", "159", "77", "777", "199", "102", "16"];
+
+        function generateRandomPlate(type) {
+            let l1 = letters[Math.floor(Math.random()*letters.length)];
+            let l2 = letters[Math.floor(Math.random()*letters.length)];
+            let l3 = letters[Math.floor(Math.random()*letters.length)];
+            let num = Math.floor(Math.random()*899 + 100);
+            let reg = regions[Math.floor(Math.random()*regions.length)];
+
+            if (type === 'civil_plates') {
+                const isRare = Math.random() < 0.1;
+                if(isRare) num = "777";
+                return { str: `${l1}${num}${l2}${l3} ${reg}`, style: 'civil', price: isRare ? 500000 : 30000 };
+            } else if (type === 'taxi_plates') {
+                return { str: `${l1}${l2} ${Math.floor(Math.random()*89+10)} ${reg}`, style: 'taxi', price: 40000 };
+            } else if (type === 'police_plates') {
+                return { str: `А ${Math.floor(Math.random()*8999+1000)} ${reg}`, style: 'police', price: 150000 };
+            } else if (type === 'military_plates') {
+                return { str: `${Math.floor(Math.random()*8999+1000)} ${l1}${l2}`, style: 'military', price: 80000 };
             }
-        };
-
-        function setMode(newMode) {
-            mode = newMode;
-            document.getElementById('btnModeCars').classList.toggle('active', mode === 'cars');
-            document.getElementById('btnModePlates').classList.toggle('active', mode === 'plates');
-            renderCategories();
         }
 
-        function renderCategories() {
-            const scroll = document.getElementById('catScroll');
-            scroll.innerHTML = '';
-            const cats = Object.keys(db[mode]);
-            currentCat = cats[0];
-            spinCost = db[mode][currentCat].cost;
+        function renderPlateHTML(str, styleClass) {
+            return `<div class="plate-ui ${styleClass}">${str} <span class="flag-box">RUS</span></div>`;
+        }
 
-            cats.forEach((catKey, idx) => {
-                const chip = document.createElement('div');
-                chip.className = `cat-chip ${idx === 0 ? 'active' : ''}`;
-                chip.innerText = catKey.toUpperCase();
-                chip.onclick = () => {
-                    document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
-                    chip.classList.add('active');
-                    currentCat = catKey;
-                    spinCost = db[mode][catKey].cost;
-                    document.getElementById('spinBtn').innerText = `Крутить (${spinCost.toLocaleString()} ₽)`;
-                    initStrip();
-                };
-                scroll.appendChild(chip);
-            });
-            document.getElementById('spinBtn').innerText = `Крутить (${spinCost.toLocaleString()} ₽)`;
+        function setMode(m) {
+            mode = m;
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
             initStrip();
-        }
-
-        function getRandomItem() {
-            const pool = db[mode][currentCat].items;
-            let total = pool.reduce((sum, item) => sum + item.weight, 0);
-            let rnd = Math.random() * total;
-            for (let item of pool) {
-                if (rnd < item.weight) return item;
-                rnd -= item.weight;
-            }
-            return pool[0];
         }
 
         const strip = document.getElementById('strip');
@@ -324,35 +228,37 @@
             strip.innerHTML = '';
             stripItems = [];
 
-            for (let i = 0; i < 40; i++) {
-                let item = getRandomItem();
+            for (let i = 0; i < 35; i++) {
+                let item = {};
+                if (mode === 'cars') {
+                    item = { name: "ВАЗ 2107", price: 150000, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Lada_2107_izh.jpg/320px-Lada_2107_izh.jpg" };
+                } else {
+                    let p = generateRandomPlate(mode);
+                    item = { name: "Гос. Номер", plateStr: p.str, style: p.style, price: p.price };
+                }
                 stripItems.push(item);
+
                 let div = document.createElement('div');
                 div.className = 'roulette-item';
-                div.innerHTML = `
-                    <div class="item-name">${item.name}</div>
-                    <img class="item-img" src="${item.img || 'https://via.placeholder.com/80'}">
-                    <div class="item-price">${item.price.toLocaleString()} ₽</div>
-                `;
+                div.innerHTML = mode === 'cars' 
+                    ? `<div style="font-size:11px; font-weight:bold;">${item.name}</div><img src="${item.img}" style="width:70px;"><div style="color:var(--green); font-size:11px;">${item.price.toLocaleString()} ₽</div>`
+                    : `<div style="font-size:10px;">НОМЕР</div>${renderPlateHTML(item.plateStr, item.style)}<div style="color:var(--green); font-size:11px;">${item.price.toLocaleString()} ₽</div>`;
                 strip.appendChild(div);
             }
         }
 
         function startSpin() {
-            if (user.balance < spinCost) {
-                alert("❌ Недостаточно средств!");
-                return;
-            }
-            user.balance -= spinCost;
+            if (user.balance < 100000) return alert("❌ Недостаточно средств!");
+            user.balance -= 100000;
             updateUI();
 
             const spinBtn = document.getElementById('spinBtn');
             spinBtn.disabled = true;
             initStrip();
 
-            const winIdx = 25;
+            const winIdx = 22;
             const winItem = stripItems[winIdx];
-            const targetPos = (winIdx * 142) - 160;
+            const targetPos = (winIdx * 152) - 140;
 
             setTimeout(() => {
                 strip.style.transition = 'transform 3.5s cubic-bezier(0.15, 0.85, 0.15, 1)';
@@ -361,10 +267,119 @@
 
             setTimeout(() => {
                 spinBtn.disabled = false;
-                inventory.push({ id: Date.now(), ...winItem });
-                renderInventory();
-                alert(`🎉 Вы выбили: ${winItem.name} (${winItem.price.toLocaleString()} ₽)!`);
+                if (mode !== 'cars') {
+                    // Анимация бегающих букв на номере!
+                    const modal = document.getElementById('plateAnimModal');
+                    const box = document.getElementById('animPlateBox');
+                    modal.style.display = 'block';
+                    
+                    let interval = setInterval(() => {
+                        let tempP = generateRandomPlate(mode);
+                        box.innerHTML = renderPlateHTML(tempP.str, tempP.style);
+                    }, 80);
+
+                    setTimeout(() => {
+                        clearInterval(interval);
+                        box.innerHTML = renderPlateHTML(winItem.plateStr, winItem.style);
+                        document.getElementById('animPlatePrice').innerText = `Оценка: ${winItem.price.toLocaleString()} ₽`;
+                        inventory.push({ id: Date.now(), type: 'plate', title: winItem.plateStr, style: winItem.style, price: winItem.price });
+                        renderInventory();
+                    }, 1500);
+                } else {
+                    inventory.push({ id: Date.now(), type: 'car', title: winItem.name, price: winItem.price, plate: null });
+                    renderInventory();
+                    alert(`🎉 Вы выбили автомобиль: ${winItem.name}!`);
+                }
             }, 3600);
+        }
+
+        function attachPlateToCar(plateId) {
+            let cars = inventory.filter(i => i.type === 'car');
+            if (cars.length === 0) return alert("❌ У вас нет автомобилей в гараже!");
+            
+            let plateIdx = inventory.findIndex(i => i.id === plateId);
+            let plate = inventory[plateIdx];
+
+            let targetCar = cars[0]; // Ставим на первую авто
+            targetCar.plate = plate.title;
+            targetCar.price += plate.price; // ПОВЫШАЕМ СТОИМОСТЬ МАШИНЫ!
+
+            inventory.splice(plateIdx, 1);
+            renderInventory();
+            alert(`✅ Номер ${plate.title} успешно установлен на ${targetCar.title}! Стоимость машины выросла до ${targetCar.price.toLocaleString()} ₽!`);
+        }
+
+        function sellOnMarket(id) {
+            let item = inventory.find(i => i.id === id);
+            let stars = prompt("Введите цену в ⭐ Stars для продажи на авторынке (Минимум 2 ⭐):", "2");
+            stars = parseInt(stars);
+
+            if (stars >= 2) {
+                marketItems.push({
+                    id: Date.now(),
+                    seller: "Вы",
+                    title: item.title,
+                    plate: item.plate || item.title,
+                    priceStars: stars,
+                    type: item.type
+                });
+                inventory = inventory.filter(i => i.id !== id);
+                renderInventory();
+                renderMarket();
+                alert(`🏪 Выставлено на продажу за ${stars} ⭐! При покупке 1 ⭐ пойдет тебе, а 1 ⭐ — комиссии серверу.`);
+            }
+        }
+
+        function buyFromMarket(marketId) {
+            let idx = marketItems.findIndex(m => m.id === marketId);
+            let item = marketItems[idx];
+
+            if (user.stars < item.priceStars) return alert("❌ Недостаточно ⭐ Stars!");
+
+            user.stars -= item.priceStars;
+            // 1 звезда тебе как владельцу, остальное продавцу
+            alert(`🎉 Куплено! 1 ⭐ ушла в комиссию проекта!`);
+            marketItems.splice(idx, 1);
+            updateUI();
+            renderMarket();
+        }
+
+        function renderInventory() {
+            const list = document.getElementById('inventoryList');
+            list.innerHTML = inventory.length === 0 ? '<p style="color:var(--text-muted);">Пусто...</p>' : '';
+            inventory.forEach(item => {
+                list.innerHTML += `
+                    <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; padding:10px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div style="font-weight:bold;">${item.title} ${item.plate ? `(${item.plate})` : ''}</div>
+                            <div style="color:var(--green); font-size:12px;">${item.price.toLocaleString()} ₽</div>
+                        </div>
+                        <div>
+                            ${item.type === 'plate' ? `<button onclick="attachPlateToCar(${item.id})" style="background:var(--accent); border:none; padding:5px 8px; border-radius:6px; font-weight:bold; cursor:pointer;">🔗 На авто</button>` : ''}
+                            <button onclick="sellOnMarket(${item.id})" style="background:none; border:1px solid var(--star); color:var(--star); padding:5px 8px; border-radius:6px; cursor:pointer;">Продать за ⭐</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderMarket() {
+            const list = document.getElementById('marketList');
+            list.innerHTML = '';
+            marketItems.forEach(m => {
+                list.innerHTML += `
+                    <div class="market-card">
+                        <div>
+                            <div style="font-weight:bold;">${m.title}</div>
+                            <div style="font-size:11px; color:var(--text-muted);">Продавец: ${m.seller}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div class="star-price">⭐ ${m.priceStars} Stars</div>
+                            <button onclick="buyFromMarket(${m.id})" style="background:var(--star); color:#000; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer; margin-top:4px;">Купить</button>
+                        </div>
+                    </div>
+                `;
+            });
         }
 
         function updateUI() {
@@ -379,38 +394,8 @@
             if(btn) btn.classList.add('active');
         }
 
-        function copyRefLink() {
-            const refLink = `https://t.me/your_bot_username?start=ref_${user.id}`;
-            navigator.clipboard.writeText(refLink);
-            alert("🔗 Реферальная ссылка скопирована!");
-        }
-
-        function buyStarsPack(starsCount, rubAmount) {
-            // Вызов встроенного интерфейса Telegram Stars Invoice
-            if (tg && tg.openInvoice) {
-                alert(`Инициирован платеж на ${starsCount} ⭐. После подтверждения баланс пополнится на ${rubAmount.toLocaleString()} ₽.`);
-            } else {
-                user.stars += starsCount;
-                user.balance += rubAmount;
-                updateUI();
-                alert(`Тестовая покупка: +${rubAmount.toLocaleString()} ₽!`);
-            }
-        }
-
-        function renderInventory() {
-            const list = document.getElementById('inventoryList');
-            list.innerHTML = inventory.length === 0 ? '<p style="color:var(--text-muted);">Инвентарь пуст...</p>' : '';
-            inventory.forEach(item => {
-                list.innerHTML += `
-                    <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; padding:10px; margin-bottom:8px;">
-                        <div style="font-weight:bold; font-size:14px;">${item.name}</div>
-                        <div style="color:var(--green); font-size:12px; font-weight:bold;">Оценка: ${item.price.toLocaleString()} ₽</div>
-                    </div>
-                `;
-            });
-        }
-
-        renderCategories();
+        initStrip();
+        renderMarket();
     </script>
 </body>
 </html>
