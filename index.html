@@ -54,7 +54,7 @@
         .mode-btn.active { background: var(--accent); color: #000; }
 
         .roulette-container {
-            position: relative; width: 100%; height: 150px;
+            position: relative; width: 100%; height: 140px;
             background: #111319; border-radius: 16px;
             border: 2px solid var(--card-border); overflow: hidden;
             box-shadow: inset 0 0 25px rgba(0,0,0,0.9); margin-bottom: 15px;
@@ -66,9 +66,9 @@
         }
         .roulette-strip { display: flex; position: absolute; top: 0; left: 0; height: 100%; align-items: center; }
         .roulette-item {
-            min-width: 140px; height: 130px; margin: 0 6px;
+            min-width: 140px; height: 110px; margin: 0 6px;
             background: var(--card-bg); border-radius: 12px;
-            display: flex; flex-direction: column; justify-content: space-between;
+            display: flex; flex-direction: column; justify-content: center;
             align-items: center; padding: 8px; box-sizing: border-box;
             border: 1px solid var(--card-border);
         }
@@ -143,9 +143,8 @@
         <button class="btn-primary" id="spinBtn" onclick="startSpin()">Крутить (100,000 ₽)</button>
 
         <div id="plateAnimModal" style="display:none; text-align:center; margin-top:15px; background:var(--card-bg); padding:15px; border-radius:14px; border:1px solid var(--accent);">
-            <div style="font-size:12px; color:var(--text-muted);">ГЕНЕРАЦИЯ ГОС. НОМЕРА...</div>
-            <div id="animPlateBox" style="margin:10px 0;"></div>
-            <div id="animPlatePrice" style="color:var(--green); font-weight:bold;"></div>
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom: 5px;">ВЫПАЛ НОМЕР:</div>
+            <div id="animPlateBox"></div>
         </div>
     </div>
 
@@ -172,12 +171,13 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        let user = { balance: 500000, stars: 10 };
-        let mode = 'cars_civil';
-        let inventory = [];
-        let marketItems = [
+        let user = JSON.parse(localStorage.getItem('car_user')) || { balance: 500000, stars: 10 };
+        let inventory = JSON.parse(localStorage.getItem('car_inventory')) || [];
+        let marketItems = JSON.parse(localStorage.getItem('car_market')) || [
             { id: 901, seller: "Олигарх", title: "BMW M5 F90", priceStars: 5, type: "car" }
         ];
+
+        let mode = 'cars_civil';
 
         const letters = "АВЕКМНОРСТУХ";
         const regions = ["59", "159", "77", "777", "199", "102"];
@@ -203,6 +203,12 @@
                 { name: "Броневик Тигр", price: 12000000, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/GAZ_Tigr_parade_Moscow.jpg/320px-GAZ_Tigr_parade_Moscow.jpg" }
             ]
         };
+
+        function saveData() {
+            localStorage.setItem('car_user', JSON.stringify(user));
+            localStorage.setItem('car_inventory', JSON.stringify(inventory));
+            localStorage.setItem('car_market', JSON.stringify(marketItems));
+        }
 
         function generateRandomPlate(m) {
             let l1 = letters[Math.floor(Math.random()*letters.length)];
@@ -258,9 +264,10 @@
 
                 let div = document.createElement('div');
                 div.className = 'roulette-item';
+                // Без цен в рулетке! Только картинка/номер и название
                 div.innerHTML = item.type === 'car'
-                    ? `<div style="font-size:11px; font-weight:bold; white-space:nowrap; overflow:hidden; width:100%; text-align:center;">${item.name}</div><img src="${item.img}" style="width:75px; height:45px; object-fit:contain;"><div style="color:var(--green); font-size:11px; font-weight:bold;">${item.price.toLocaleString()} ₽</div>`
-                    : `<div style="font-size:10px; color:var(--text-muted);">НОМЕР</div>${renderPlateHTML(item.plateStr, item.style)}<div style="color:var(--green); font-size:11px; font-weight:bold;">${item.price.toLocaleString()} ₽</div>`;
+                    ? `<div style="font-size:11px; font-weight:bold; white-space:nowrap; overflow:hidden; width:100%; text-align:center; margin-bottom:4px;">${item.name}</div><img src="${item.img}" style="width:75px; height:45px; object-fit:contain;">`
+                    : `<div style="font-size:10px; color:var(--text-muted); margin-bottom:4px;">НОМЕР</div>${renderPlateHTML(item.plateStr, item.style)}`;
                 strip.appendChild(div);
             }
         }
@@ -269,6 +276,7 @@
             if (user.balance < 100000) return alert("❌ Недостаточно средств!");
             user.balance -= 100000;
             updateUI();
+            saveData();
 
             const spinBtn = document.getElementById('spinBtn');
             spinBtn.disabled = true;
@@ -291,21 +299,24 @@
                     const box = document.getElementById('animPlateBox');
                     modal.style.display = 'block';
                     
+                    // Честная анимация случайного перебора номеров
                     let interval = setInterval(() => {
                         let tempP = generateRandomPlate(mode);
                         box.innerHTML = renderPlateHTML(tempP.str, tempP.style);
-                    }, 80);
+                    }, 70);
 
+                    // В конце останавливаемся на том же самом выпавшем номере
                     setTimeout(() => {
                         clearInterval(interval);
                         box.innerHTML = renderPlateHTML(winItem.plateStr, winItem.style);
-                        document.getElementById('animPlatePrice').innerText = `Оценка: ${winItem.price.toLocaleString()} ₽`;
                         inventory.push({ id: Date.now(), type: 'plate', title: winItem.plateStr, style: winItem.style, price: winItem.price });
                         renderInventory();
+                        saveData();
                     }, 1500);
                 } else {
                     inventory.push({ id: Date.now(), type: 'car', title: winItem.name, price: winItem.price, plate: null });
                     renderInventory();
+                    saveData();
                     alert(`🎉 Вы выбили автомобиль: ${winItem.name}!`);
                 }
             }, 3600);
@@ -324,6 +335,7 @@
 
             inventory.splice(plateIdx, 1);
             renderInventory();
+            saveData();
             alert(`✅ Номер ${plate.title} установлен на ${targetCar.title}! Стоимость выросла до ${targetCar.price.toLocaleString()} ₽!`);
         }
 
@@ -343,6 +355,7 @@
                 inventory = inventory.filter(i => i.id !== id);
                 renderInventory();
                 renderMarket();
+                saveData();
                 alert(`🏪 Выставлено на рынок за ${stars} ⭐!`);
             }
         }
@@ -359,6 +372,7 @@
             updateUI();
             renderInventory();
             renderMarket();
+            saveData();
             alert(`🎉 Успешно куплено! 1 ⭐ ушла в комиссию сервера.`);
         }
 
@@ -412,7 +426,9 @@
             if(btn) btn.classList.add('active');
         }
 
+        updateUI();
         initStrip();
+        renderInventory();
         renderMarket();
     </script>
 </body>
