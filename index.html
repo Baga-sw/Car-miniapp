@@ -41,10 +41,7 @@
         .page { display: none; padding: 15px; }
         .page.active { display: block; }
 
-        /* Главные вкладки (Авто / Номера) */
-        .main-tabs {
-            display: flex; gap: 8px; margin-bottom: 12px;
-        }
+        .main-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
         .main-tab-btn {
             flex: 1; padding: 12px; background: var(--card-bg); border: 1px solid var(--card-border);
             color: var(--text-muted); font-weight: bold; border-radius: 12px;
@@ -52,7 +49,6 @@
         }
         .main-tab-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
 
-        /* Подразделения */
         .sub-switch {
             display: flex; gap: 6px; margin-bottom: 15px; overflow-x: auto;
             background: var(--card-bg); padding: 4px; border-radius: 12px;
@@ -65,7 +61,6 @@
         }
         .sub-btn.active { background: var(--text-main); color: #000; }
 
-        /* Рулетка */
         .roulette-container {
             position: relative; width: 100%; height: 150px;
             background: #111319; border-radius: 16px;
@@ -86,22 +81,22 @@
             border: 1px solid var(--card-border);
         }
 
-        /* Гос. номера по ГОСТу */
         .plate-ui {
             background: #fff; color: #000; border: 2px solid #000; border-radius: 5px;
             padding: 4px 10px; font-family: 'Courier New', monospace; font-weight: bold;
-            font-size: 13px; display: inline-flex; align-items: center; gap: 5px;
+            font-size: 12px; display: inline-flex; align-items: center; gap: 4px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.5); letter-spacing: 1px;
         }
         .plate-ui.taxi { background: #ffcc00; color: #000; }
         .plate-ui.police { background: #0055ff; color: #fff; border-color: #fff; }
         .plate-ui.military { background: #1a1a1a; color: #fff; border-color: #333; }
-        .plate-ui .flag-box { border-left: 1px solid #000; padding-left: 4px; font-size: 9px; line-height: 1; }
+        .plate-ui .flag-box { border-left: 1px solid #000; padding-left: 3px; font-size: 8px; line-height: 1; }
 
         .btn-primary {
             background: var(--accent-gradient); color: #000; border: none;
             padding: 15px; border-radius: 14px; font-size: 15px; font-weight: bold;
             width: 100%; cursor: pointer; box-shadow: 0 6px 20px rgba(241, 196, 15, 0.3);
+            margin-bottom: 8px;
         }
 
         .market-card {
@@ -109,7 +104,6 @@
             border-radius: 14px; padding: 12px; margin-bottom: 10px;
             display: flex; justify-content: space-between; align-items: center;
         }
-        .star-price { color: var(--star); font-weight: bold; font-size: 14px; }
 
         .nav-bar {
             position: fixed; bottom: 0; left: 0; right: 0; background: #111319;
@@ -137,13 +131,11 @@
 
     <!-- РУЛЕТКА -->
     <div id="page-spin" class="page active">
-        <!-- Главные вкладки -->
         <div class="main-tabs">
             <button class="main-tab-btn active" id="tabCars" onclick="switchMainTab('cars')">🚗 Автомобили</button>
             <button class="main-tab-btn" id="tabPlates" onclick="switchMainTab('plates')">🔢 Номера</button>
         </div>
 
-        <!-- Подразделения для машин -->
         <div class="sub-switch" id="subCars">
             <button class="sub-btn active" onclick="setSubMode('cars_civil', this)">Гражданские</button>
             <button class="sub-btn" onclick="setSubMode('cars_trucks', this)">Грузовики</button>
@@ -152,12 +144,11 @@
             <button class="sub-btn" onclick="setSubMode('cars_military', this)">Военные</button>
         </div>
 
-        <!-- Подразделения для номеров -->
         <div class="sub-switch" id="subPlates" style="display:none;">
             <button class="sub-btn active" onclick="setSubMode('plates_civil', this)">Гражданские</button>
             <button class="sub-btn" onclick="setSubMode('plates_taxi', this)">Такси</button>
-            <button class="sub-btn" onclick="setSubMode('plates_police', this)">Синие (Полиция)</button>
-            <button class="sub-btn" onclick="setSubMode('plates_military', this)">Черные (Военные)</button>
+            <button class="sub-btn" onclick="setSubMode('plates_police', this)">Синие</button>
+            <button class="sub-btn" onclick="setSubMode('plates_military', this)">Черные</button>
         </div>
 
         <div class="roulette-container">
@@ -168,7 +159,7 @@
         <button class="btn-primary" id="spinBtn" onclick="startSpin()">Крутить (100,000 ₽)</button>
 
         <div id="plateAnimModal" style="display:none; text-align:center; margin-top:15px; background:var(--card-bg); padding:15px; border-radius:14px; border:1px solid var(--accent);">
-            <div style="font-size:12px; color:var(--text-muted); margin-bottom: 5px;" id="winTitleBox">РЕЗУЛЬТАТ ВЫПАДЕНИЯ:</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom: 5px;">ВЫПАЛ ПРЕДМЕТ:</div>
             <div id="animBox"></div>
         </div>
     </div>
@@ -181,15 +172,18 @@
 
     <!-- АВТОРЫНОК -->
     <div id="page-market" class="page">
-        <h3 style="margin-top:0;">🏪 Авторынок (за ⭐)</h3>
-        <p style="font-size:11px; color:var(--text-muted);">Комиссия площадки: 1 ⭐ идет серверу при покупке!</p>
+        <h3 style="margin-top:0;">🏪 P2P Авторынок</h3>
+        <div style="display:flex; gap:6px; margin-bottom:10px;">
+            <button class="sub-btn active" id="marketTabStars" onclick="switchMarketTab('stars')">⭐ За Звёзды</button>
+            <button class="sub-btn" id="marketTabRub" onclick="switchMarketTab('rub')">💵 За Рубли (₽)</button>
+        </div>
         <div id="marketList"></div>
     </div>
 
     <div class="nav-bar">
         <button class="nav-item active" onclick="switchNavPage('spin', this)"><span>🎰</span>Рулетка</button>
         <button class="nav-item" onclick="switchNavPage('inventory', this)"><span>🎒</span>Гараж</button>
-        <button class="nav-item" onclick="switchNavPage('market', this)"><span>🏪</span>Авторынок</button>
+        <button class="nav-item" onclick="switchNavPage('market', this)"><span>🏪</span>Рынок</button>
     </div>
 
     <script>
@@ -199,16 +193,17 @@
         let user = JSON.parse(localStorage.getItem('car_user')) || { balance: 500000, stars: 10 };
         let inventory = JSON.parse(localStorage.getItem('car_inventory')) || [];
         let marketItems = JSON.parse(localStorage.getItem('car_market')) || [
-            { id: 901, seller: "Олигарх", title: "BMW M5 F90", priceStars: 5, type: "car" }
+            { id: 901, seller: "Олигарх", title: "BMW M5 F90", price: 5, currency: "stars", type: "car" },
+            { id: 902, seller: "Бродяга", title: "ВАЗ 2107", price: 200000, currency: "rub", type: "car" }
         ];
 
         let currentMain = 'cars';
         let currentSub = 'cars_civil';
+        let marketCurrency = 'stars';
 
         const letters = "АВЕКМНОРСТУХ";
         const regions = ["59", "159", "77", "777", "199", "102"];
 
-        // Базы данных машин с реальными фото
         const carDatabases = {
             cars_civil: [
                 { name: "ВАЗ 2107", price: 150000, rarity: "common", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Lada_2107_izh.jpg/320px-Lada_2107_izh.jpg" },
@@ -231,7 +226,6 @@
             ]
         };
 
-        // Генератор номеров
         function generateRandomPlate(sub) {
             let l1 = letters[Math.floor(Math.random()*letters.length)];
             let l2 = letters[Math.floor(Math.random()*letters.length)];
@@ -256,52 +250,6 @@
             return `<div class="plate-ui ${styleClass}">${str} <span class="flag-box">R<br>U<br>S</span></div>`;
         }
 
-        // Синтезатор звуков редкости через Web Audio API
-        function playSound(rarity) {
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-
-                let now = ctx.currentTime;
-                if (rarity === 'common') {
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(440, now);
-                    gain.gain.setValueAtTime(0.1, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
-                    osc.start(now); osc.stop(now + 0.2);
-                } else if (rarity === 'rare') {
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(587.33, now);
-                    osc.frequency.setValueAtTime(880, now + 0.1);
-                    gain.gain.setValueAtTime(0.15, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-                    osc.start(now); osc.stop(now + 0.35);
-                } else if (rarity === 'epic') {
-                    osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(300, now);
-                    osc.frequency.linearRampToValueAtTime(750, now + 0.3);
-                    gain.gain.setValueAtTime(0.2, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-                    osc.start(now); osc.stop(now + 0.5);
-                } else if (rarity === 'legendary') {
-                    // Эффектный футуристический аккорд
-                    [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
-                        let o = ctx.createOscillator();
-                        let g = ctx.createGain();
-                        o.type = 'square';
-                        o.frequency.setValueAtTime(freq, now + idx * 0.05);
-                        o.connect(g); g.connect(ctx.destination);
-                        g.gain.setValueAtTime(0.1, now + idx * 0.05);
-                        g.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-                        o.start(now + idx * 0.05); o.stop(now + 0.8);
-                    });
-                }
-            } catch(e) {}
-        }
-
         function saveData() {
             localStorage.setItem('car_user', JSON.stringify(user));
             localStorage.setItem('car_inventory', JSON.stringify(inventory));
@@ -312,7 +260,6 @@
             currentMain = main;
             document.getElementById('tabCars').classList.toggle('active', main === 'cars');
             document.getElementById('tabPlates').classList.toggle('active', main === 'plates');
-            
             document.getElementById('subCars').style.display = main === 'cars' ? 'flex' : 'none';
             document.getElementById('subPlates').style.display = main === 'plates' ? 'flex' : 'none';
 
@@ -325,8 +272,7 @@
 
         function setSubMode(sub, btn) {
             currentSub = sub;
-            let parent = btn.parentElement;
-            parent.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+            btn.parentElement.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             initStrip();
         }
@@ -362,7 +308,7 @@
         }
 
         function startSpin() {
-            if (user.balance < 100000) return alert("❌ Недостаточно средств!");
+            if (user.balance < 100000) return alert("❌ Недостаточно средств! Продайте что-нибудь на рынке или в гос.");
             user.balance -= 100000;
             updateUI();
             saveData();
@@ -383,8 +329,6 @@
 
             setTimeout(() => {
                 spinBtn.disabled = false;
-                playSound(winItem.rarity);
-
                 const modal = document.getElementById('plateAnimModal');
                 const box = document.getElementById('animBox');
                 modal.style.display = 'block';
@@ -425,27 +369,61 @@
             inventory.splice(plateIdx, 1);
             renderInventory();
             saveData();
-            alert(`✅ Номер ${plate.title} установлен на ${targetCar.title}! Стоимость выросла до ${targetCar.price.toLocaleString()} ₽!`);
+            alert(`✅ Номер ${plate.title} установлен на ${targetCar.title}!`);
         }
 
+        // Продажа в гос (по сниженной цене)
+        function sellToState(id) {
+            let item = inventory.find(i => i.id === id);
+            let statePrice = Math.floor(item.price * 0.5); // Гос. цена 50%
+            user.balance += statePrice;
+            inventory = inventory.filter(i => i.id !== id);
+            updateUI();
+            renderInventory();
+            saveData();
+            alert(`✅ Предмет продан государству за ${statePrice.toLocaleString()} ₽!`);
+        }
+
+        // Продажа за просмотр рекламы (Бонусные рубли)
+        function sellForAd(id) {
+            let item = inventory.find(i => i.id === id);
+            let adBonus = Math.floor(item.price * 0.8); // 80% за рекламу
+            
+            // Имитация просмотра рекламы с таймером
+            alert("📺 Запуск рекламного ролика... Пожалуйста, подождите 3 секунды.");
+            setTimeout(() => {
+                user.balance += adBonus;
+                inventory = inventory.filter(i => i.id !== id);
+                updateUI();
+                renderInventory();
+                saveData();
+                alert(`🎉 Реклама просмотрена! Получено ${adBonus.toLocaleString()} ₽ за продажу ${item.title}!`);
+            }, 3000);
+        }
+
+        // Выставить на рынок
         function sellOnMarket(id) {
             let item = inventory.find(i => i.id === id);
-            let stars = prompt("Введите цену в ⭐ Stars для продажи:", "2");
-            stars = parseInt(stars);
+            let curr = prompt("Выберите валюту для продажи:\nВведите 'stars' (за звезды) или 'rub' (за рубли):", "stars");
+            if (!curr || (curr !== 'stars' && curr !== 'rub')) return;
 
-            if (stars >= 2) {
+            let price = prompt(`Введите цену в ${curr === 'stars' ? '⭐ Stars (мин. 2)' : 'рублях (₽)'}:`, curr === 'stars' ? "2" : "200000");
+            price = parseInt(price);
+
+            if (price > 0) {
                 marketItems.push({
                     id: Date.now(),
                     seller: "Вы",
                     title: item.title,
-                    priceStars: stars,
+                    price: price,
+                    currency: curr,
                     type: item.type
                 });
                 inventory = inventory.filter(i => i.id !== id);
                 renderInventory();
                 renderMarket();
                 saveData();
-                alert(`🏪 Выставлено на рынок за ${stars} ⭐!`);
+                alert(`🏪 Успешно выставлено на рынок!`);
             }
         }
 
@@ -453,16 +431,28 @@
             let idx = marketItems.findIndex(m => m.id === marketId);
             let item = marketItems[idx];
 
-            if (user.stars < item.priceStars) return alert("❌ Недостаточно ⭐ Stars!");
+            if (item.currency === 'stars') {
+                if (user.stars < item.price) return alert("❌ Недостаточно ⭐ Stars!");
+                user.stars -= item.price;
+            } else {
+                if (user.balance < item.price) return alert("❌ Недостаточно рублей (₽)!");
+                user.balance -= item.price;
+            }
 
-            user.stars -= item.priceStars;
             inventory.push({ id: Date.now(), type: item.type, title: item.title, price: 1000000 });
             marketItems.splice(idx, 1);
             updateUI();
             renderInventory();
             renderMarket();
             saveData();
-            alert(`🎉 Успешно куплено! 1 ⭐ ушла в комиссию сервера.`);
+            alert(`🎉 Успешно куплено!`);
+        }
+
+        function switchMarketTab(curr) {
+            marketCurrency = curr;
+            document.getElementById('marketTabStars').classList.toggle('active', curr === 'stars');
+            document.getElementById('marketTabRub').classList.toggle('active', curr === 'rub');
+            renderMarket();
         }
 
         function renderInventory() {
@@ -470,14 +460,14 @@
             list.innerHTML = inventory.length === 0 ? '<p style="color:var(--text-muted);">Гараж пуст...</p>' : '';
             inventory.forEach(item => {
                 list.innerHTML += `
-                    <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; padding:10px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <div style="font-weight:bold;">${item.title} ${item.plate ? `(Гос. номер: ${item.plate})` : ''}</div>
-                            <div style="color:var(--green); font-size:12px;">Оценка: ${item.price.toLocaleString()} ₽</div>
-                        </div>
-                        <div>
-                            ${item.type === 'plate' ? `<button onclick="attachPlateToCar(${item.id})" style="background:var(--accent); border:none; padding:5px 8px; border-radius:6px; font-weight:bold; cursor:pointer; margin-right:4px;">🔗 На авто</button>` : ''}
-                            <button onclick="sellOnMarket(${item.id})" style="background:none; border:1px solid var(--star); color:var(--star); padding:5px 8px; border-radius:6px; cursor:pointer;">Продать</button>
+                    <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; padding:10px; margin-bottom:8px;">
+                        <div style="font-weight:bold; margin-bottom:4px;">${item.title} ${item.plate ? `(Гос. номер: ${item.plate})` : ''}</div>
+                        <div style="color:var(--green); font-size:12px; margin-bottom:6px;">Оценка: ${item.price.toLocaleString()} ₽</div>
+                        <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                            ${item.type === 'plate' ? `<button onclick="attachPlateToCar(${item.id})" style="background:var(--accent); border:none; padding:4px 8px; border-radius:6px; font-weight:bold; cursor:pointer;">🔗 На авто</button>` : ''}
+                            <button onclick="sellToState(${item.id})" style="background:#555; color:#fff; border:none; padding:4px 8px; border-radius:6px; cursor:pointer; font-size:11px;">В гос (полцены)</button>
+                            <button onclick="sellForAd(${item.id})" style="background:#27ae60; color:#fff; border:none; padding:4px 8px; border-radius:6px; cursor:pointer; font-size:11px;">📺 За рекламу</button>
+                            <button onclick="sellOnMarket(${item.id})" style="background:none; border:1px solid var(--star); color:var(--star); padding:4px 8px; border-radius:6px; cursor:pointer; font-size:11px;">На рынок</button>
                         </div>
                     </div>
                 `;
@@ -487,7 +477,14 @@
         function renderMarket() {
             const list = document.getElementById('marketList');
             list.innerHTML = '';
-            marketItems.forEach(m => {
+            let filtered = marketItems.filter(m => m.currency === marketCurrency);
+            
+            if (filtered.length === 0) {
+                list.innerHTML = '<p style="color:var(--text-muted);">На рынке пока ничего нет...</p>';
+                return;
+            }
+
+            filtered.forEach(m => {
                 list.innerHTML += `
                     <div class="market-card">
                         <div>
@@ -495,8 +492,10 @@
                             <div style="font-size:11px; color:var(--text-muted);">Продавец: ${m.seller}</div>
                         </div>
                         <div style="text-align:right;">
-                            <div class="star-price">⭐ ${m.priceStars} Stars</div>
-                            <button onclick="buyFromMarket(${m.id})" style="background:var(--star); color:#000; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer; margin-top:4px;">Купить</button>
+                            <div style="color:${m.currency === 'stars' ? 'var(--star)' : 'var(--accent)'}; font-weight:bold; font-size:14px;">
+                                ${m.currency === 'stars' ? '⭐ ' + m.price + ' Stars' : m.price.toLocaleString() + ' ₽'}
+                            </div>
+                            <button onclick="buyFromMarket(${m.id})" style="background:var(--accent); color:#000; border:none; padding:5px 10px; border-radius:6px; font-weight:bold; cursor:pointer; margin-top:4px;">Купить</button>
                         </div>
                     </div>
                 `;
