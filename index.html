@@ -81,16 +81,16 @@
             border: 1px solid var(--card-border);
         }
 
-        .plate-ui {
-            background: #fff; color: #000; border: 2px solid #000; border-radius: 5px;
-            padding: 4px 10px; font-family: 'Courier New', monospace; font-weight: bold;
-            font-size: 12px; display: inline-flex; align-items: center; gap: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5); letter-spacing: 1px;
+        /* Четкие цветные рамки номеров А000АА 77 */
+        .plate-box {
+            background: #ffffff; color: #000000; border: 3px solid #000000; border-radius: 6px;
+            padding: 6px 10px; font-family: 'Courier New', monospace; font-weight: bold;
+            font-size: 14px; letter-spacing: 1.5px; box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            display: inline-block; text-align: center;
         }
-        .plate-ui.taxi { background: #ffcc00; color: #000; }
-        .plate-ui.police { background: #0055ff; color: #fff; border-color: #fff; }
-        .plate-ui.military { background: #1a1a1a; color: #fff; border-color: #333; }
-        .plate-ui .flag-box { border-left: 1px solid #000; padding-left: 3px; font-size: 8px; line-height: 1; }
+        .plate-box.taxi { background: #ffcc00; color: #000000; border-color: #000000; }
+        .plate-box.police { background: #0044cc; color: #ffffff; border-color: #ffffff; }
+        .plate-box.military { background: #1a1a1a; color: #ffffff; border-color: #444444; }
 
         .btn-primary {
             background: var(--accent-gradient); color: #000; border: none;
@@ -204,25 +204,26 @@
         const letters = "АВЕКМНОРСТУХ";
         const regions = ["59", "159", "77", "777", "199", "102"];
 
+        // Надежные ссылки на изображения машин
         const carDatabases = {
             cars_civil: [
-                { name: "ВАЗ 2107", price: 150000, rarity: "common", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Lada_2107_izh.jpg/320px-Lada_2107_izh.jpg" },
-                { name: "Lada Priora", price: 350000, rarity: "common", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Lada_Priora_Hatchback_orenburg.jpg/320px-Lada_Priora_Hatchback_orenburg.jpg" },
-                { name: "BMW M5 F90", price: 9500000, rarity: "legendary", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/BMW_M5_%28F90%29_IMG_4761.jpg/320px-BMW_M5_%28F90%29_IMG_4761.jpg" }
+                { name: "ВАЗ 2107", price: 150000, rarity: "common", img: "https://avatars.mds.yandex.net/get-verba/787013/2a0000016335df427e02e1cd82a6c8e37603/c_scale_500" },
+                { name: "Lada Priora", price: 350000, rarity: "common", img: "https://avatars.mds.yandex.net/get-verba/1536739/2a0000016b801a2e8c255d648b26e2e58c97/c_scale_500" },
+                { name: "BMW M5 F90", price: 9500000, rarity: "legendary", img: "https://avatars.mds.yandex.net/get-autoclub/1541334/2a0000016d2b512c0199e8d47b85e054a32b/c_scale_500" }
             ],
             cars_trucks: [
-                { name: "ГАЗель NEXT", price: 1800000, rarity: "rare", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/GAZelle_Next_at_Comtrans_2013.jpg/320px-GAZelle_Next_at_Comtrans_2013.jpg" },
-                { name: "КАМАЗ Самовал", price: 3500000, rarity: "epic", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Kamaz-6520_dump_truck.jpg/320px-Kamaz-6520_dump_truck.jpg" }
+                { name: "ГАЗель NEXT", price: 1800000, rarity: "rare", img: "https://avatars.mds.yandex.net/get-verba/216016/2a0000015c7e1bc6386bc54138e678a3c8a9/c_scale_500" },
+                { name: "КАМАЗ Самовал", price: 3500000, rarity: "epic", img: "https://avatars.mds.yandex.net/get-verba/937147/2a00000160298a8341b53907c1266b7b252d/c_scale_500" }
             ],
             cars_police: [
-                { name: "Полиция Granta", price: 600000, rarity: "common", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Lada_Granta_Police_Russia.jpg/320px-Lada_Granta_Police_Russia.jpg" },
-                { name: "ДПС Skoda Octavia", price: 1800000, rarity: "rare", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Skoda_Octavia_DPS_ГИБДД.jpg/320px-Skoda_Octavia_DPS_ГИБДД.jpg" }
+                { name: "Полиция Granta", price: 600000, rarity: "common", img: "https://avatars.mds.yandex.net/get-verba/937147/2a000001637c35e8954aa86576d330cd9a43/c_scale_500" },
+                { name: "ДПС Skoda Octavia", price: 1800000, rarity: "rare", img: "https://avatars.mds.yandex.net/get-verba/1536739/2a0000016c68e3aa78ef2bfa2f9bc9bc6551/c_scale_500" }
             ],
             cars_mchs: [
-                { name: "МЧС УАЗ Патриот", price: 1200000, rarity: "rare", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/UAZ-469_Military.jpg/320px-UAZ-469_Military.jpg" }
+                { name: "МЧС УАЗ Патриот", price: 1200000, rarity: "rare", img: "https://avatars.mds.yandex.net/get-verba/787013/2a000001689255ec3a2420f12c114dc7b5b5/c_scale_500" }
             ],
             cars_military: [
-                { name: "Броневик Тигр", price: 12000000, rarity: "legendary", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/GAZ_Tigr_parade_Moscow.jpg/320px-GAZ_Tigr_parade_Moscow.jpg" }
+                { name: "Броневик Тигр", price: 12000000, rarity: "legendary", img: "https://avatars.mds.yandex.net/get-verba/216016/2a00000160a3c26b70db6ff6714a938ea5f7/c_scale_500" }
             ]
         };
 
@@ -236,18 +237,18 @@
             if (sub === 'plates_civil') {
                 let isRare = Math.random() < 0.1;
                 if(isRare) num = "777";
-                return { str: `${l1}${num}${l2}${l3} ${reg}`, style: 'civil', price: isRare ? 500000 : 30000, rarity: isRare ? 'epic' : 'common' };
+                return { str: `${l1}${num}${l2}${l3} ${reg}`, style: '', price: isRare ? 500000 : 30000 };
             } else if (sub === 'plates_taxi') {
-                return { str: `${l1}${l2} ${Math.floor(Math.random()*89+10)} ${reg}`, style: 'taxi', price: 40000, rarity: 'rare' };
+                return { str: `${l1}${l2} ${Math.floor(Math.random()*89+10)} ${reg}`, style: 'taxi', price: 40000 };
             } else if (sub === 'plates_police') {
-                return { str: `А ${Math.floor(Math.random()*8999+1000)} ${reg}`, style: 'police', price: 150000, rarity: 'epic' };
+                return { str: `А ${Math.floor(Math.random()*8999+1000)} ${reg}`, style: 'police', price: 150000 };
             } else if (sub === 'plates_military') {
-                return { str: `${Math.floor(Math.random()*8999+1000)} ${l1}${l2}`, style: 'military', price: 80000, rarity: 'rare' };
+                return { str: `${Math.floor(Math.random()*8999+1000)} ${l1}${l2}`, style: 'military', price: 80000 };
             }
         }
 
         function renderPlateHTML(str, styleClass) {
-            return `<div class="plate-ui ${styleClass}">${str} <span class="flag-box">R<br>U<br>S</span></div>`;
+            return `<div class="plate-box ${styleClass}">${str}</div>`;
         }
 
         function saveData() {
@@ -294,21 +295,21 @@
                     item = { type: 'car', name: car.name, price: car.price, rarity: car.rarity, img: car.img };
                 } else {
                     let p = generateRandomPlate(currentSub);
-                    item = { type: 'plate', name: "Гос. Номер", plateStr: p.str, style: p.style, price: p.price, rarity: p.rarity };
+                    item = { type: 'plate', name: "Гос. Номер", plateStr: p.str, style: p.style, price: p.price };
                 }
                 stripItems.push(item);
 
                 let div = document.createElement('div');
                 div.className = 'roulette-item';
                 div.innerHTML = item.type === 'car'
-                    ? `<div style="font-size:11px; font-weight:bold; white-space:nowrap; overflow:hidden; width:100%; text-align:center; margin-bottom:4px;">${item.name}</div><img src="${item.img}" style="width:75px; height:45px; object-fit:contain;">`
-                    : `<div style="font-size:10px; color:var(--text-muted); margin-bottom:4px;">НОМЕР</div>${renderPlateHTML(item.plateStr, item.style)}`;
+                    ? `<div style="font-size:10px; font-weight:bold; white-space:nowrap; overflow:hidden; width:100%; text-align:center; margin-bottom:4px;">${item.name}</div><img src="${item.img}" style="width:80px; height:50px; object-fit:contain;">`
+                    : renderPlateHTML(item.plateStr, item.style);
                 strip.appendChild(div);
             }
         }
 
         function startSpin() {
-            if (user.balance < 100000) return alert("❌ Недостаточно средств! Продайте что-нибудь на рынке или в гос.");
+            if (user.balance < 100000) return alert("❌ Недостаточно средств!");
             user.balance -= 100000;
             updateUI();
             saveData();
@@ -347,7 +348,7 @@
                         saveData();
                     }, 1500);
                 } else {
-                    box.innerHTML = `<div style="font-weight:bold; margin-bottom:5px;">${winItem.name}</div><img src="${winItem.img}" style="width:120px;">`;
+                    box.innerHTML = `<div style="font-weight:bold; margin-bottom:5px;">${winItem.name}</div><img src="${winItem.img}" style="width:130px; height:70px; object-fit:contain;">`;
                     inventory.push({ id: Date.now(), type: 'car', title: winItem.name, price: winItem.price, plate: null });
                     renderInventory();
                     saveData();
@@ -357,7 +358,7 @@
 
         function attachPlateToCar(plateId) {
             let cars = inventory.filter(i => i.type === 'car');
-            if (cars.length === 0) return alert("❌ Сначала выбейте хотя бы один автомобиль в гараж!");
+            if (cars.length === 0) return alert("❌ Сначала выбейте автомобиль!");
             
             let plateIdx = inventory.findIndex(i => i.id === plateId);
             let plate = inventory[plateIdx];
@@ -372,42 +373,38 @@
             alert(`✅ Номер ${plate.title} установлен на ${targetCar.title}!`);
         }
 
-        // Продажа в гос (по сниженной цене)
         function sellToState(id) {
             let item = inventory.find(i => i.id === id);
-            let statePrice = Math.floor(item.price * 0.5); // Гос. цена 50%
+            let statePrice = Math.floor(item.price * 0.5);
             user.balance += statePrice;
             inventory = inventory.filter(i => i.id !== id);
             updateUI();
             renderInventory();
             saveData();
-            alert(`✅ Предмет продан государству за ${statePrice.toLocaleString()} ₽!`);
+            alert(`✅ Продано государству за ${statePrice.toLocaleString()} ₽!`);
         }
 
-        // Продажа за просмотр рекламы (Бонусные рубли)
         function sellForAd(id) {
             let item = inventory.find(i => i.id === id);
-            let adBonus = Math.floor(item.price * 0.8); // 80% за рекламу
+            let adBonus = Math.floor(item.price * 0.8);
             
-            // Имитация просмотра рекламы с таймером
-            alert("📺 Запуск рекламного ролика... Пожалуйста, подождите 3 секунды.");
+            alert("📺 Запуск рекламного ролика...");
             setTimeout(() => {
                 user.balance += adBonus;
                 inventory = inventory.filter(i => i.id !== id);
                 updateUI();
                 renderInventory();
                 saveData();
-                alert(`🎉 Реклама просмотрена! Получено ${adBonus.toLocaleString()} ₽ за продажу ${item.title}!`);
-            }, 3000);
+                alert(`🎉 Получено ${adBonus.toLocaleString()} ₽ за просмотр рекламы!`);
+            }, 2000);
         }
 
-        // Выставить на рынок
         function sellOnMarket(id) {
             let item = inventory.find(i => i.id === id);
-            let curr = prompt("Выберите валюту для продажи:\nВведите 'stars' (за звезды) или 'rub' (за рубли):", "stars");
+            let curr = prompt("Введите валюту ('stars' или 'rub'):", "stars");
             if (!curr || (curr !== 'stars' && curr !== 'rub')) return;
 
-            let price = prompt(`Введите цену в ${curr === 'stars' ? '⭐ Stars (мин. 2)' : 'рублях (₽)'}:`, curr === 'stars' ? "2" : "200000");
+            let price = prompt("Введите цену:", curr === 'stars' ? "2" : "200000");
             price = parseInt(price);
 
             if (price > 0) {
@@ -423,7 +420,7 @@
                 renderInventory();
                 renderMarket();
                 saveData();
-                alert(`🏪 Успешно выставлено на рынок!`);
+                alert(`🏪 Выставлено на рынок!`);
             }
         }
 
@@ -435,7 +432,7 @@
                 if (user.stars < item.price) return alert("❌ Недостаточно ⭐ Stars!");
                 user.stars -= item.price;
             } else {
-                if (user.balance < item.price) return alert("❌ Недостаточно рублей (₽)!");
+                if (user.balance < item.price) return alert("❌ Недостаточно рублей!");
                 user.balance -= item.price;
             }
 
@@ -461,13 +458,13 @@
             inventory.forEach(item => {
                 list.innerHTML += `
                     <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; padding:10px; margin-bottom:8px;">
-                        <div style="font-weight:bold; margin-bottom:4px;">${item.title} ${item.plate ? `(Гос. номер: ${item.plate})` : ''}</div>
+                        <div style="font-weight:bold; margin-bottom:4px;">${item.title} ${item.plate ? `(Номер: ${item.plate})` : ''}</div>
                         <div style="color:var(--green); font-size:12px; margin-bottom:6px;">Оценка: ${item.price.toLocaleString()} ₽</div>
                         <div style="display:flex; gap:4px; flex-wrap:wrap;">
                             ${item.type === 'plate' ? `<button onclick="attachPlateToCar(${item.id})" style="background:var(--accent); border:none; padding:4px 8px; border-radius:6px; font-weight:bold; cursor:pointer;">🔗 На авто</button>` : ''}
-                            <button onclick="sellToState(${item.id})" style="background:#555; color:#fff; border:none; padding:4px 8px; border-radius:6px; cursor:pointer; font-size:11px;">В гос (полцены)</button>
-                            <button onclick="sellForAd(${item.id})" style="background:#27ae60; color:#fff; border:none; padding:4px 8px; border-radius:6px; cursor:pointer; font-size:11px;">📺 За рекламу</button>
-                            <button onclick="sellOnMarket(${item.id})" style="background:none; border:1px solid var(--star); color:var(--star); padding:4px 8px; border-radius:6px; cursor:pointer; font-size:11px;">На рынок</button>
+                            <button onclick="sellToState(${item.id})" style="background:#555; color:#fff; border:none; padding:4px 8px; border-radius:6px; cursor:pointer; font-size:11px;">В гос</button>
+                            <button onclick="sellForAd(${item.id})" style="background:#27ae60; color:#fff; border:none; padding:4px 8px; border-radius:6px; cursor:pointer; font-size:11px;">📺 Реклама</button>
+                            <button onclick="sellOnMarket(${item.id})" style="background:none; border:1px solid var(--star); color:var(--star); padding:4px 8px; border-radius:6px; cursor:pointer; font-size:11px;">Рынок</button>
                         </div>
                     </div>
                 `;
