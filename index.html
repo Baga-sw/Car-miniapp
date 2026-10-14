@@ -41,20 +41,33 @@
         .page { display: none; padding: 15px; }
         .page.active { display: block; }
 
-        .mode-switch {
-            display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto;
+        /* Главные вкладки (Авто / Номера) */
+        .main-tabs {
+            display: flex; gap: 8px; margin-bottom: 12px;
+        }
+        .main-tab-btn {
+            flex: 1; padding: 12px; background: var(--card-bg); border: 1px solid var(--card-border);
+            color: var(--text-muted); font-weight: bold; border-radius: 12px;
+            cursor: pointer; font-size: 14px; text-align: center;
+        }
+        .main-tab-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
+        /* Подразделения */
+        .sub-switch {
+            display: flex; gap: 6px; margin-bottom: 15px; overflow-x: auto;
             background: var(--card-bg); padding: 4px; border-radius: 12px;
             border: 1px solid var(--card-border); scrollbar-width: none;
         }
-        .mode-btn {
+        .sub-btn {
             flex: 1; padding: 8px 10px; background: none; border: none;
             color: var(--text-muted); font-weight: bold; border-radius: 8px;
             cursor: pointer; font-size: 11px; white-space: nowrap;
         }
-        .mode-btn.active { background: var(--accent); color: #000; }
+        .sub-btn.active { background: var(--text-main); color: #000; }
 
+        /* Рулетка */
         .roulette-container {
-            position: relative; width: 100%; height: 140px;
+            position: relative; width: 100%; height: 150px;
             background: #111319; border-radius: 16px;
             border: 2px solid var(--card-border); overflow: hidden;
             box-shadow: inset 0 0 25px rgba(0,0,0,0.9); margin-bottom: 15px;
@@ -66,23 +79,24 @@
         }
         .roulette-strip { display: flex; position: absolute; top: 0; left: 0; height: 100%; align-items: center; }
         .roulette-item {
-            min-width: 140px; height: 110px; margin: 0 6px;
+            min-width: 140px; height: 130px; margin: 0 6px;
             background: var(--card-bg); border-radius: 12px;
             display: flex; flex-direction: column; justify-content: center;
             align-items: center; padding: 8px; box-sizing: border-box;
             border: 1px solid var(--card-border);
         }
 
+        /* Гос. номера по ГОСТу */
         .plate-ui {
             background: #fff; color: #000; border: 2px solid #000; border-radius: 5px;
-            padding: 3px 8px; font-family: 'Courier New', monospace; font-weight: bold;
-            font-size: 12px; display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 10px; font-family: 'Courier New', monospace; font-weight: bold;
+            font-size: 13px; display: inline-flex; align-items: center; gap: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.5); letter-spacing: 1px;
         }
         .plate-ui.taxi { background: #ffcc00; color: #000; }
         .plate-ui.police { background: #0055ff; color: #fff; border-color: #fff; }
         .plate-ui.military { background: #1a1a1a; color: #fff; border-color: #333; }
-        .plate-ui .flag-box { border-left: 1px solid #000; padding-left: 3px; font-size: 9px; }
+        .plate-ui .flag-box { border-left: 1px solid #000; padding-left: 4px; font-size: 9px; line-height: 1; }
 
         .btn-primary {
             background: var(--accent-gradient); color: #000; border: none;
@@ -123,16 +137,27 @@
 
     <!-- РУЛЕТКА -->
     <div id="page-spin" class="page active">
-        <div class="mode-switch">
-            <button class="mode-btn active" onclick="setMode('cars_civil')">🚗 Гражд. Авто</button>
-            <button class="mode-btn" onclick="setMode('cars_trucks')">🚛 Грузовики</button>
-            <button class="mode-btn" onclick="setMode('cars_police')">🚔 Полиция</button>
-            <button class="mode-btn" onclick="setMode('cars_mchs')">🚒 МЧС</button>
-            <button class="mode-btn" onclick="setMode('cars_military')">🪖 Военные</button>
-            <button class="mode-btn" onclick="setMode('plates_civil')">⚪ Номера</button>
-            <button class="mode-btn" onclick="setMode('plates_taxi')">🟡 Такси</button>
-            <button class="mode-btn" onclick="setMode('plates_police')">🔵 Синие</button>
-            <button class="mode-btn" onclick="setMode('plates_military')">⚫ Черные</button>
+        <!-- Главные вкладки -->
+        <div class="main-tabs">
+            <button class="main-tab-btn active" id="tabCars" onclick="switchMainTab('cars')">🚗 Автомобили</button>
+            <button class="main-tab-btn" id="tabPlates" onclick="switchMainTab('plates')">🔢 Номера</button>
+        </div>
+
+        <!-- Подразделения для машин -->
+        <div class="sub-switch" id="subCars">
+            <button class="sub-btn active" onclick="setSubMode('cars_civil', this)">Гражданские</button>
+            <button class="sub-btn" onclick="setSubMode('cars_trucks', this)">Грузовики</button>
+            <button class="sub-btn" onclick="setSubMode('cars_police', this)">Полиция</button>
+            <button class="sub-btn" onclick="setSubMode('cars_mchs', this)">МЧС</button>
+            <button class="sub-btn" onclick="setSubMode('cars_military', this)">Военные</button>
+        </div>
+
+        <!-- Подразделения для номеров -->
+        <div class="sub-switch" id="subPlates" style="display:none;">
+            <button class="sub-btn active" onclick="setSubMode('plates_civil', this)">Гражданские</button>
+            <button class="sub-btn" onclick="setSubMode('plates_taxi', this)">Такси</button>
+            <button class="sub-btn" onclick="setSubMode('plates_police', this)">Синие (Полиция)</button>
+            <button class="sub-btn" onclick="setSubMode('plates_military', this)">Черные (Военные)</button>
         </div>
 
         <div class="roulette-container">
@@ -143,8 +168,8 @@
         <button class="btn-primary" id="spinBtn" onclick="startSpin()">Крутить (100,000 ₽)</button>
 
         <div id="plateAnimModal" style="display:none; text-align:center; margin-top:15px; background:var(--card-bg); padding:15px; border-radius:14px; border:1px solid var(--accent);">
-            <div style="font-size:12px; color:var(--text-muted); margin-bottom: 5px;">ВЫПАЛ НОМЕР:</div>
-            <div id="animPlateBox"></div>
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom: 5px;" id="winTitleBox">РЕЗУЛЬТАТ ВЫПАДЕНИЯ:</div>
+            <div id="animBox"></div>
         </div>
     </div>
 
@@ -162,9 +187,9 @@
     </div>
 
     <div class="nav-bar">
-        <button class="nav-item active" onclick="switchPage('spin', this)"><span>🎰</span>Рулетка</button>
-        <button class="nav-item" onclick="switchPage('inventory', this)"><span>🎒</span>Гараж</button>
-        <button class="nav-item" onclick="switchPage('market', this)"><span>🏪</span>Авторынок</button>
+        <button class="nav-item active" onclick="switchNavPage('spin', this)"><span>🎰</span>Рулетка</button>
+        <button class="nav-item" onclick="switchNavPage('inventory', this)"><span>🎒</span>Гараж</button>
+        <button class="nav-item" onclick="switchNavPage('market', this)"><span>🏪</span>Авторынок</button>
     </div>
 
     <script>
@@ -177,32 +202,105 @@
             { id: 901, seller: "Олигарх", title: "BMW M5 F90", priceStars: 5, type: "car" }
         ];
 
-        let mode = 'cars_civil';
+        let currentMain = 'cars';
+        let currentSub = 'cars_civil';
 
         const letters = "АВЕКМНОРСТУХ";
         const regions = ["59", "159", "77", "777", "199", "102"];
 
+        // Базы данных машин с реальными фото
         const carDatabases = {
             cars_civil: [
-                { name: "ВАЗ 2107", price: 150000, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Lada_2107_izh.jpg/320px-Lada_2107_izh.jpg" },
-                { name: "Lada Priora", price: 350000, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Lada_Priora_Hatchback_orenburg.jpg/320px-Lada_Priora_Hatchback_orenburg.jpg" },
-                { name: "BMW M5 F90", price: 9500000, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/BMW_M5_%28F90%29_IMG_4761.jpg/320px-BMW_M5_%28F90%29_IMG_4761.jpg" }
+                { name: "ВАЗ 2107", price: 150000, rarity: "common", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Lada_2107_izh.jpg/320px-Lada_2107_izh.jpg" },
+                { name: "Lada Priora", price: 350000, rarity: "common", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Lada_Priora_Hatchback_orenburg.jpg/320px-Lada_Priora_Hatchback_orenburg.jpg" },
+                { name: "BMW M5 F90", price: 9500000, rarity: "legendary", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/BMW_M5_%28F90%29_IMG_4761.jpg/320px-BMW_M5_%28F90%29_IMG_4761.jpg" }
             ],
             cars_trucks: [
-                { name: "ГАЗель NEXT", price: 1800000, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/GAZelle_Next_at_Comtrans_2013.jpg/320px-GAZelle_Next_at_Comtrans_2013.jpg" },
-                { name: "КАМАЗ Самовал", price: 3500000, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Kamaz-6520_dump_truck.jpg/320px-Kamaz-6520_dump_truck.jpg" }
+                { name: "ГАЗель NEXT", price: 1800000, rarity: "rare", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/GAZelle_Next_at_Comtrans_2013.jpg/320px-GAZelle_Next_at_Comtrans_2013.jpg" },
+                { name: "КАМАЗ Самовал", price: 3500000, rarity: "epic", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Kamaz-6520_dump_truck.jpg/320px-Kamaz-6520_dump_truck.jpg" }
             ],
             cars_police: [
-                { name: "Полиция Granta", price: 600000, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Lada_Granta_Police_Russia.jpg/320px-Lada_Granta_Police_Russia.jpg" },
-                { name: "ДПС Skoda Octavia", price: 1800000, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Skoda_Octavia_DPS_ГИБДД.jpg/320px-Skoda_Octavia_DPS_ГИБДД.jpg" }
+                { name: "Полиция Granta", price: 600000, rarity: "common", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Lada_Granta_Police_Russia.jpg/320px-Lada_Granta_Police_Russia.jpg" },
+                { name: "ДПС Skoda Octavia", price: 1800000, rarity: "rare", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Skoda_Octavia_DPS_ГИБДД.jpg/320px-Skoda_Octavia_DPS_ГИБДД.jpg" }
             ],
             cars_mchs: [
-                { name: "МЧС УАЗ Патриот", price: 1200000, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/UAZ-469_Military.jpg/320px-UAZ-469_Military.jpg" }
+                { name: "МЧС УАЗ Патриот", price: 1200000, rarity: "rare", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/UAZ-469_Military.jpg/320px-UAZ-469_Military.jpg" }
             ],
             cars_military: [
-                { name: "Броневик Тигр", price: 12000000, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/GAZ_Tigr_parade_Moscow.jpg/320px-GAZ_Tigr_parade_Moscow.jpg" }
+                { name: "Броневик Тигр", price: 12000000, rarity: "legendary", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/GAZ_Tigr_parade_Moscow.jpg/320px-GAZ_Tigr_parade_Moscow.jpg" }
             ]
         };
+
+        // Генератор номеров
+        function generateRandomPlate(sub) {
+            let l1 = letters[Math.floor(Math.random()*letters.length)];
+            let l2 = letters[Math.floor(Math.random()*letters.length)];
+            let l3 = letters[Math.floor(Math.random()*letters.length)];
+            let num = Math.floor(Math.random()*899 + 100);
+            let reg = regions[Math.floor(Math.random()*regions.length)];
+
+            if (sub === 'plates_civil') {
+                let isRare = Math.random() < 0.1;
+                if(isRare) num = "777";
+                return { str: `${l1}${num}${l2}${l3} ${reg}`, style: 'civil', price: isRare ? 500000 : 30000, rarity: isRare ? 'epic' : 'common' };
+            } else if (sub === 'plates_taxi') {
+                return { str: `${l1}${l2} ${Math.floor(Math.random()*89+10)} ${reg}`, style: 'taxi', price: 40000, rarity: 'rare' };
+            } else if (sub === 'plates_police') {
+                return { str: `А ${Math.floor(Math.random()*8999+1000)} ${reg}`, style: 'police', price: 150000, rarity: 'epic' };
+            } else if (sub === 'plates_military') {
+                return { str: `${Math.floor(Math.random()*8999+1000)} ${l1}${l2}`, style: 'military', price: 80000, rarity: 'rare' };
+            }
+        }
+
+        function renderPlateHTML(str, styleClass) {
+            return `<div class="plate-ui ${styleClass}">${str} <span class="flag-box">R<br>U<br>S</span></div>`;
+        }
+
+        // Синтезатор звуков редкости через Web Audio API
+        function playSound(rarity) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                let now = ctx.currentTime;
+                if (rarity === 'common') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, now);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+                    osc.start(now); osc.stop(now + 0.2);
+                } else if (rarity === 'rare') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(587.33, now);
+                    osc.frequency.setValueAtTime(880, now + 0.1);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                    osc.start(now); osc.stop(now + 0.35);
+                } else if (rarity === 'epic') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.linearRampToValueAtTime(750, now + 0.3);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                    osc.start(now); osc.stop(now + 0.5);
+                } else if (rarity === 'legendary') {
+                    // Эффектный футуристический аккорд
+                    [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                        let o = ctx.createOscillator();
+                        let g = ctx.createGain();
+                        o.type = 'square';
+                        o.frequency.setValueAtTime(freq, now + idx * 0.05);
+                        o.connect(g); g.connect(ctx.destination);
+                        g.gain.setValueAtTime(0.1, now + idx * 0.05);
+                        g.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+                        o.start(now + idx * 0.05); o.stop(now + 0.8);
+                    });
+                }
+            } catch(e) {}
+        }
 
         function saveData() {
             localStorage.setItem('car_user', JSON.stringify(user));
@@ -210,34 +308,26 @@
             localStorage.setItem('car_market', JSON.stringify(marketItems));
         }
 
-        function generateRandomPlate(m) {
-            let l1 = letters[Math.floor(Math.random()*letters.length)];
-            let l2 = letters[Math.floor(Math.random()*letters.length)];
-            let l3 = letters[Math.floor(Math.random()*letters.length)];
-            let num = Math.floor(Math.random()*899 + 100);
-            let reg = regions[Math.floor(Math.random()*regions.length)];
+        function switchMainTab(main) {
+            currentMain = main;
+            document.getElementById('tabCars').classList.toggle('active', main === 'cars');
+            document.getElementById('tabPlates').classList.toggle('active', main === 'plates');
+            
+            document.getElementById('subCars').style.display = main === 'cars' ? 'flex' : 'none';
+            document.getElementById('subPlates').style.display = main === 'plates' ? 'flex' : 'none';
 
-            if (m === 'plates_civil') {
-                let isRare = Math.random() < 0.1;
-                if(isRare) num = "777";
-                return { str: `${l1}${num}${l2}${l3} ${reg}`, style: 'civil', price: isRare ? 500000 : 30000 };
-            } else if (m === 'plates_taxi') {
-                return { str: `${l1}${l2} ${Math.floor(Math.random()*89+10)} ${reg}`, style: 'taxi', price: 40000 };
-            } else if (m === 'plates_police') {
-                return { str: `А ${Math.floor(Math.random()*8999+1000)} ${reg}`, style: 'police', price: 150000 };
-            } else if (m === 'plates_military') {
-                return { str: `${Math.floor(Math.random()*8999+1000)} ${l1}${l2}`, style: 'military', price: 80000 };
+            if (main === 'cars') {
+                setSubMode('cars_civil', document.querySelector('#subCars .sub-btn'));
+            } else {
+                setSubMode('plates_civil', document.querySelector('#subPlates .sub-btn'));
             }
         }
 
-        function renderPlateHTML(str, styleClass) {
-            return `<div class="plate-ui ${styleClass}">${str} <span class="flag-box">RUS</span></div>`;
-        }
-
-        function setMode(m) {
-            mode = m;
-            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
+        function setSubMode(sub, btn) {
+            currentSub = sub;
+            let parent = btn.parentElement;
+            parent.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
             initStrip();
         }
 
@@ -252,19 +342,18 @@
 
             for (let i = 0; i < 35; i++) {
                 let item = {};
-                if (mode.startsWith('cars_')) {
-                    let pool = carDatabases[mode];
+                if (currentMain === 'cars') {
+                    let pool = carDatabases[currentSub];
                     let car = pool[Math.floor(Math.random() * pool.length)];
-                    item = { type: 'car', name: car.name, price: car.price, img: car.img };
+                    item = { type: 'car', name: car.name, price: car.price, rarity: car.rarity, img: car.img };
                 } else {
-                    let p = generateRandomPlate(mode);
-                    item = { type: 'plate', name: "Гос. Номер", plateStr: p.str, style: p.style, price: p.price };
+                    let p = generateRandomPlate(currentSub);
+                    item = { type: 'plate', name: "Гос. Номер", plateStr: p.str, style: p.style, price: p.price, rarity: p.rarity };
                 }
                 stripItems.push(item);
 
                 let div = document.createElement('div');
                 div.className = 'roulette-item';
-                // Без цен в рулетке! Только картинка/номер и название
                 div.innerHTML = item.type === 'car'
                     ? `<div style="font-size:11px; font-weight:bold; white-space:nowrap; overflow:hidden; width:100%; text-align:center; margin-bottom:4px;">${item.name}</div><img src="${item.img}" style="width:75px; height:45px; object-fit:contain;">`
                     : `<div style="font-size:10px; color:var(--text-muted); margin-bottom:4px;">НОМЕР</div>${renderPlateHTML(item.plateStr, item.style)}`;
@@ -294,18 +383,18 @@
 
             setTimeout(() => {
                 spinBtn.disabled = false;
+                playSound(winItem.rarity);
+
+                const modal = document.getElementById('plateAnimModal');
+                const box = document.getElementById('animBox');
+                modal.style.display = 'block';
+
                 if (winItem.type === 'plate') {
-                    const modal = document.getElementById('plateAnimModal');
-                    const box = document.getElementById('animPlateBox');
-                    modal.style.display = 'block';
-                    
-                    // Честная анимация случайного перебора номеров
                     let interval = setInterval(() => {
-                        let tempP = generateRandomPlate(mode);
+                        let tempP = generateRandomPlate(currentSub);
                         box.innerHTML = renderPlateHTML(tempP.str, tempP.style);
                     }, 70);
 
-                    // В конце останавливаемся на том же самом выпавшем номере
                     setTimeout(() => {
                         clearInterval(interval);
                         box.innerHTML = renderPlateHTML(winItem.plateStr, winItem.style);
@@ -314,10 +403,10 @@
                         saveData();
                     }, 1500);
                 } else {
+                    box.innerHTML = `<div style="font-weight:bold; margin-bottom:5px;">${winItem.name}</div><img src="${winItem.img}" style="width:120px;">`;
                     inventory.push({ id: Date.now(), type: 'car', title: winItem.name, price: winItem.price, plate: null });
                     renderInventory();
                     saveData();
-                    alert(`🎉 Вы выбили автомобиль: ${winItem.name}!`);
                 }
             }, 3600);
         }
@@ -419,7 +508,7 @@
             document.getElementById('userStars').innerText = `⭐ ${user.stars} Stars`;
         }
 
-        function switchPage(pageName, btn) {
+        function switchNavPage(pageName, btn) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById('page-' + pageName).classList.add('active');
