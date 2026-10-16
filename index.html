@@ -1,303 +1,843 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Песочные Сокровища</title>
-  <!-- Telegram WebApp SDK -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    :root {
-      --bg-color: #1c1815;
-      --card-bg: #2a2420;
-      --accent-color: #f39c12;
-      --text-color: #f1f2f6;
-    }
-
-    body {
-      margin: 0;
-      padding: 15px;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    /* Верхняя панель статистики */
-    .stats-bar {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      max-width: 360px;
-      margin-bottom: 15px;
-      background: var(--card-bg);
-      padding: 10px 15px;
-      border-radius: 12px;
-      box-sizing: border-box;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    }
-
-    .stat-item {
-      font-size: 14px;
-      font-weight: bold;
-    }
-
-    .stat-value {
-      color: var(--accent-color);
-    }
-
-    /* Игровое поле */
-    .grid-container {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
-      width: 100%;
-      max-width: 360px;
-      height: 360px;
-      margin-bottom: 15px;
-    }
-
-    .cell {
-      background-color: #d4a373; /* Цвет песка */
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      cursor: pointer;
-      transition: transform 0.1s, background-color 0.3s;
-      position: relative;
-      box-shadow: inset -2px -2px 0px rgba(0,0,0,0.2);
-    }
-
-    .cell:active {
-      transform: scale(0.95);
-    }
-
-    .cell.dug {
-      background-color: #3d312a; /* Откопанная земля */
-      box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5);
-      cursor: default;
-    }
-
-    /* Рамки редкости для найденных предметов */
-    .item-common { border: 2px solid #a4b0be; }
-    .item-rare { border: 2px solid #1e90ff; }
-    .item-epic { border: 2px solid #a55eea; }
-    .item-legendary { border: 2px solid #ffa502; box-shadow: 0 0 10px #ffa502; }
-
-    /* Панель инвентаря и действий */
-    .controls {
-      width: 100%;
-      max-width: 360px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .btn {
-      background-color: var(--accent-color);
-      color: #000;
-      border: none;
-      padding: 12px;
-      border-radius: 10px;
-      font-weight: bold;
-      font-size: 16px;
-      cursor: pointer;
-      text-align: center;
-      transition: opacity 0.2s;
-    }
-
-    .btn:active {
-      opacity: 0.8;
-    }
-
-    /* Всплывающее уведомление о находке */
-    .modal {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.8);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-    }
-
-    .modal-content {
-      background: var(--card-bg);
-      padding: 20px;
-      border-radius: 16px;
-      text-align: center;
-      max-width: 280px;
-      width: 100%;
-    }
-
-    .modal-icon { font-size: 50px; margin-bottom: 10px; }
-    .modal-title { font-size: 18px; margin-bottom: 5px; font-weight: bold; }
-    .modal-rarity { font-size: 12px; margin-bottom: 15px; text-transform: uppercase; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Мистический Котёл — Rare Elixir Hunter</title>
+    <!-- Yandex Games SDK -->
+    <script src="https://sdk.games.s3.yandex.net/sdk.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800&family=Press+Start+2P&display=swap');
+        
+        :root {
+            --bg: #0a0a1a;
+            --card: rgba(20, 20, 40, 0.85);
+            --neon: #00f5d4;
+            --gold: #ffd700;
+            --epic: #bf00ff;
+            --leg: #ff6b00;
+            --myth: linear-gradient(45deg, #ff00ff, #00ffff, #ffff00);
+            --text: #e0e0ff;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            background: var(--bg);
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(0, 245, 212, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(191, 0, 255, 0.12) 0%, transparent 40%),
+                linear-gradient(180deg, #0a0a1a 0%, #12122b 100%);
+            color: var(--text);
+            font-family: 'Rubik', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+        }
+        
+        #loading {
+            position: fixed; inset: 0; background: #050510;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 9999; transition: opacity 0.6s;
+        }
+        #loading h1 { font-family: 'Press Start 2P', cursive; font-size: 18px; color: var(--neon); text-shadow: 0 0 20px var(--neon); margin-bottom: 20px; text-align: center; }
+        .loader { width: 60px; height: 60px; border: 4px solid rgba(0,245,212,0.2); border-top: 4px solid var(--neon); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        header {
+            width: 100%; max-width: 500px; padding: 12px 16px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--card); backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0,245,212,0.3);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .stat { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 15px; }
+        .stat span { color: var(--gold); text-shadow: 0 0 8px var(--gold); }
+        .btn-icon {
+            width: 42px; height: 42px; border-radius: 12px;
+            background: linear-gradient(135deg, rgba(0,245,212,0.2), rgba(191,0,255,0.2));
+            border: 1px solid rgba(0,245,212,0.4); color: white;
+            font-size: 20px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-icon:active { transform: scale(0.92); }
+        
+        main {
+            flex: 1; width: 100%; max-width: 500px; padding: 16px;
+            display: flex; flex-direction: column; align-items: center; gap: 18px;
+        }
+        
+        .cauldron-area {
+            position: relative; width: 280px; height: 280px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 10px 0;
+        }
+        
+        .cauldron {
+            width: 220px; height: 220px; border-radius: 50% 50% 45% 45%;
+            background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 60%, #2a1a3a 100%);
+            border: 4px solid #4a3a6a;
+            box-shadow: 
+                0 0 40px rgba(0,245,212,0.3),
+                inset 0 -20px 40px rgba(0,0,0,0.6),
+                inset 0 10px 20px rgba(255,255,255,0.05);
+            position: relative; overflow: hidden;
+            transition: transform 0.15s;
+        }
+        .cauldron.brewing { animation: brewShake 0.4s ease-in-out infinite; }
+        @keyframes brewShake {
+            0%,100% { transform: rotate(-1deg) scale(1); }
+            50% { transform: rotate(1deg) scale(1.03); }
+        }
+        
+        .liquid {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 55%;
+            background: linear-gradient(180deg, #00f5d4, #0077ff, #bf00ff);
+            border-radius: 0 0 40% 40%;
+            animation: bubble 2s ease-in-out infinite;
+            opacity: 0.85;
+        }
+        @keyframes bubble {
+            0%,100% { height: 52%; filter: brightness(1); }
+            50% { height: 58%; filter: brightness(1.2); }
+        }
+        
+        .bubbles { position: absolute; inset: 0; pointer-events: none; }
+        .bubble {
+            position: absolute; bottom: 20%; width: 12px; height: 12px;
+            background: rgba(255,255,255,0.6); border-radius: 50%;
+            animation: rise 2.5s ease-in infinite;
+        }
+        @keyframes rise {
+            0% { transform: translateY(0) scale(1); opacity: 0.8; }
+            100% { transform: translateY(-120px) scale(0.3); opacity: 0; }
+        }
+        
+        .steam {
+            position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
+            width: 80px; height: 40px; background: radial-gradient(ellipse, rgba(200,255,255,0.4), transparent);
+            filter: blur(8px); animation: steam 3s ease-in-out infinite;
+        }
+        @keyframes steam { 0%,100% { opacity: 0.4; transform: translateX(-50%) scale(1); } 50% { opacity: 0.8; transform: translateX(-50%) scale(1.2); } }
+        
+        #brewBtn {
+            position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+            width: 160px; height: 56px; border: none; border-radius: 28px;
+            background: linear-gradient(135deg, #00f5d4, #00c4a7);
+            color: #0a0a1a; font-weight: 800; font-size: 18px;
+            box-shadow: 0 8px 25px rgba(0,245,212,0.5), 0 0 0 4px rgba(0,245,212,0.2);
+            cursor: pointer; transition: all 0.2s; z-index: 10;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        #brewBtn:active { transform: translateX(-50%) scale(0.95); }
+        #brewBtn:disabled { opacity: 0.6; filter: grayscale(0.5); }
+        
+        .result-card {
+            width: 100%; max-width: 340px; background: var(--card);
+            border-radius: 20px; padding: 20px; text-align: center;
+            border: 2px solid transparent; backdrop-filter: blur(10px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            transform: scale(0.8); opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none; position: relative; overflow: hidden;
+        }
+        .result-card.show { transform: scale(1); opacity: 1; pointer-events: auto; }
+        .result-card.common { border-color: #aaa; }
+        .result-card.uncommon { border-color: #2ecc71; box-shadow: 0 0 30px rgba(46,204,113,0.4); }
+        .result-card.rare { border-color: #3498db; box-shadow: 0 0 30px rgba(52,152,219,0.5); }
+        .result-card.epic { border-color: #9b59b6; box-shadow: 0 0 40px rgba(155,89,182,0.6); }
+        .result-card.legendary { border-color: var(--gold); box-shadow: 0 0 50px rgba(255,215,0,0.7); animation: legendaryPulse 1s infinite; }
+        .result-card.mythic { border-image: var(--myth) 1; box-shadow: 0 0 60px #ff00ff; animation: mythicGlow 1.5s infinite; }
+        
+        @keyframes legendaryPulse { 0%,100% { box-shadow: 0 0 40px rgba(255,215,0,0.6); } 50% { box-shadow: 0 0 70px rgba(255,215,0,0.9); } }
+        @keyframes mythicGlow { 0%,100% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+        
+        .potion-icon { font-size: 64px; margin: 10px 0; filter: drop-shadow(0 0 15px currentColor); }
+        .rarity-badge {
+            display: inline-block; padding: 4px 14px; border-radius: 20px;
+            font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .potion-name { font-size: 22px; font-weight: 800; margin: 6px 0; }
+        .potion-value { color: var(--gold); font-size: 18px; font-weight: 700; }
+        
+        .actions { display: flex; gap: 10px; margin-top: 16px; justify-content: center; flex-wrap: wrap; }
+        .btn {
+            padding: 12px 20px; border: none; border-radius: 14px; font-weight: 700;
+            font-size: 15px; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-sell { background: linear-gradient(135deg, #f1c40f, #e67e22); color: #1a1a1a; }
+        .btn-keep { background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; }
+        .btn-ad { background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; }
+        .btn:active { transform: scale(0.96); }
+        
+        .last-potions {
+            display: flex; gap: 8px; overflow-x: auto; width: 100%; padding: 8px 0;
+            scrollbar-width: none;
+        }
+        .mini-potion {
+            flex-shrink: 0; width: 56px; height: 56px; border-radius: 12px;
+            background: var(--card); border: 2px solid #333;
+            display: flex; align-items: center; justify-content: center; font-size: 28px;
+        }
+        
+        /* Modals */
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            display: none; align-items: center; justify-content: center; z-index: 200;
+            padding: 16px; backdrop-filter: blur(8px);
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: var(--card); border-radius: 24px; padding: 24px;
+            width: 100%; max-width: 400px; max-height: 85vh; overflow-y: auto;
+            border: 1px solid rgba(0,245,212,0.3); position: relative;
+        }
+        .modal h2 { text-align: center; margin-bottom: 16px; color: var(--neon); font-size: 22px; }
+        .close-btn {
+            position: absolute; top: 12px; right: 16px; background: none; border: none;
+            color: #aaa; font-size: 28px; cursor: pointer;
+        }
+        
+        .upgrade-item, .collection-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px;
+            margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.08);
+        }
+        .upgrade-item button, .buy-btn {
+            padding: 8px 14px; border-radius: 10px; border: none;
+            background: var(--neon); color: #000; font-weight: 700; cursor: pointer;
+        }
+        
+        .collection-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 10px;
+        }
+        .col-item {
+            aspect-ratio: 1; border-radius: 12px; background: #111;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-size: 28px; border: 2px solid #333; position: relative;
+        }
+        .col-item.owned { border-color: var(--neon); box-shadow: 0 0 15px rgba(0,245,212,0.3); }
+        .col-item .count { position: absolute; bottom: 2px; right: 4px; font-size: 11px; background: #000; padding: 1px 5px; border-radius: 8px; }
+        
+        /* Particles & Confetti */
+        .particle {
+            position: absolute; width: 8px; height: 8px; border-radius: 50%;
+            pointer-events: none; z-index: 50;
+        }
+        
+        .floating-text {
+            position: absolute; font-weight: 800; font-size: 20px; pointer-events: none;
+            animation: floatUp 1.2s forwards; z-index: 60; text-shadow: 0 0 10px currentColor;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-80px) scale(1.2); opacity: 0; }
+        }
+        
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: rgba(0,0,0,0.9); color: white; padding: 12px 24px; border-radius: 30px;
+            font-weight: 600; z-index: 300; transition: transform 0.4s; border: 1px solid var(--neon);
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        
+        /* Responsive */
+        @media (min-width: 768px) {
+            body { padding: 20px; }
+            .cauldron-area { width: 320px; height: 320px; }
+            .cauldron { width: 260px; height: 260px; }
+            header, main { max-width: 520px; }
+        }
+        
+        /* Cool glow text */
+        .glow { text-shadow: 0 0 10px currentColor; }
+    </style>
 </head>
 <body>
-
-  <!-- Шапка со статистикой -->
-  <div class="stats-bar">
-    <div class="stat-item">💰 Монеты: <span id="coins" class="stat-value">0</span></div>
-    <div class="stat-item">⚡ Энергия: <span id="energy" class="stat-value">10/10</span></div>
-  </div>
-
-  <!-- Сетка $5 \times 5$ с песком -->
-  <div class="grid-container" id="grid"></div>
-
-  <!-- Кнопки управления -->
-  <div class="controls">
-    <button class="btn" onclick="resetGrid()">🧹 Очистить поле (Новый раскоп)</button>
-  </div>
-
-  <!-- Модальное окно для находок -->
-  <div class="modal" id="modal">
-    <div class="modal-content">
-      <div class="modal-icon" id="modal-icon">📦</div>
-      <div class="modal-title" id="modal-title">Название предмета</div>
-      <div class="modal-rarity" id="modal-rarity">Редкость</div>
-      <div style="margin-bottom: 15px;">Ценность: <span id="modal-value" style="color:#f39c12">0</span> монет</div>
-      <button class="btn" onclick="closeModal()">Забрать в багаж</button>
+    <div id="loading">
+        <h1>МИСТИЧЕСКИЙ<br>КОТЁЛ</h1>
+        <div class="loader"></div>
+        <p style="margin-top:20px;opacity:0.7">Загрузка магии...</p>
     </div>
-  </div>
 
-  <script>
-    // Инициализация Telegram WebApp API
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.expand(); // Разворачиваем приложение на весь экран
-      tg.ready();
-    }
+    <header>
+        <div class="stat">💰 <span id="coins">0</span></div>
+        <div class="stat">🍀 Удача <span id="luck">1</span></div>
+        <div style="display:flex;gap:8px">
+            <button class="btn-icon" id="btnCollection" title="Коллекция">📚</button>
+            <button class="btn-icon" id="btnShop" title="Магазин">🛒</button>
+            <button class="btn-icon" id="btnReward" title="Реклама за награду">🎬</button>
+        </div>
+    </header>
 
-    // Состояние игры
-    let coins = 0;
-    let energy = 10;
-    const maxEnergy = 10;
-    const gridSize = 25; // 5x5 сетка
+    <main>
+        <div class="cauldron-area" id="cauldronArea">
+            <div class="steam"></div>
+            <div class="cauldron" id="cauldron">
+                <div class="liquid" id="liquid"></div>
+                <div class="bubbles" id="bubbles"></div>
+            </div>
+            <button id="brewBtn">ВАРИТЬ</button>
+        </div>
 
-    // Таблица лута с вероятностями
-    const lootTable = [
-      { name: "Ржавый гвоздь", icon: "📌", rarity: "Обычный", type: "common", value: 5, chance: 0.35 },
-      { name: "Пивная крышка", icon: "🪙", rarity: "Обычный", type: "common", value: 10, chance: 0.25 },
-      { name: "Серебряная монета", icon: "🥈", rarity: "Редкий", type: "rare", value: 50, chance: 0.20 },
-      { name: "Старинные часы", icon: "⌚", rarity: "Редкий", type: "rare", value: 120, chance: 0.10 },
-      { name: "Золотой кубок", icon: "🏆", rarity: "Эпический", type: "epic", value: 300, chance: 0.07 },
-      { name: "Бриллиант Сфинкса", icon: "💎", rarity: "Легендарный", type: "legendary", value: 1000, chance: 0.03 }
-    ];
+        <div class="result-card" id="resultCard">
+            <div class="rarity-badge" id="rarityBadge">COMMON</div>
+            <div class="potion-icon" id="potionIcon">🧪</div>
+            <div class="potion-name" id="potionName">Зелье</div>
+            <div class="potion-value" id="potionValue">+10 💰</div>
+            <div class="actions">
+                <button class="btn btn-sell" id="btnSell">Продать</button>
+                <button class="btn btn-keep" id="btnKeep">В коллекцию</button>
+                <button class="btn btn-ad" id="btnDouble" style="display:none">x2 за рекламу</button>
+            </div>
+        </div>
 
-    // Генерируем игровое поле
-    function initGrid() {
-      const grid = document.getElementById('grid');
-      grid.innerHTML = '';
+        <div style="width:100%;text-align:center;opacity:0.7;font-size:13px">Последние зелья</div>
+        <div class="last-potions" id="lastPotions"></div>
+        
+        <div style="margin-top:10px;font-size:13px;opacity:0.6;text-align:center">
+            Варок: <span id="totalBrews">0</span> • Легендарок: <span id="legs">0</span>
+        </div>
+    </main>
 
-      for (let i = 0; i < gridSize; i++) {
-        const cell = document.createElement('div');
-        cell.classList.add('cell');
-        cell.dataset.index = i;
-        cell.onclick = () => digCell(cell);
-        grid.appendChild(cell);
-      }
-    }
+    <!-- Shop Modal -->
+    <div class="modal" id="shopModal">
+        <div class="modal-content">
+            <button class="close-btn" data-close="shopModal">×</button>
+            <h2>🛒 Магазин Удачи</h2>
+            <div id="shopList"></div>
+        </div>
+    </div>
 
-    // Логика копания клетки
-    function digCell(cell) {
-      if (cell.classList.contains('dug')) return;
+    <!-- Collection Modal -->
+    <div class="modal" id="collectionModal">
+        <div class="modal-content">
+            <button class="close-btn" data-close="collectionModal">×</button>
+            <h2>📚 Коллекция Эликсиров</h2>
+            <p style="text-align:center;margin-bottom:12px;opacity:0.8">Собрано: <span id="colCount">0</span> / <span id="colTotal">0</span></p>
+            <div class="collection-grid" id="collectionGrid"></div>
+        </div>
+    </div>
 
-      if (energy <= 0) {
-        alert("Закончилась энергия! Подождите или очистите поле.");
-        return;
-      }
+    <div class="toast" id="toast"></div>
 
-      // Тратим энергию
-      energy--;
-      updateUI();
+    <script>
+        // ================== GAME DATA ==================
+        const RARITIES = [
+            { id: 'common', name: 'Обычный', color: '#aaa', chance: 0.55, minVal: 5, maxVal: 15, emoji: '🧪', glow: '#aaa' },
+            { id: 'uncommon', name: 'Необычный', color: '#2ecc71', chance: 0.25, minVal: 20, maxVal: 45, emoji: '💚', glow: '#2ecc71' },
+            { id: 'rare', name: 'Редкий', color: '#3498db', chance: 0.12, minVal: 60, maxVal: 120, emoji: '💙', glow: '#3498db' },
+            { id: 'epic', name: 'Эпический', color: '#9b59b6', chance: 0.06, minVal: 200, maxVal: 400, emoji: '💜', glow: '#bf00ff' },
+            { id: 'legendary', name: 'Легендарный', color: '#ffd700', chance: 0.018, minVal: 800, maxVal: 1500, emoji: '🌟', glow: '#ffd700' },
+            { id: 'mythic', name: 'Мифический', color: '#ff00ff', chance: 0.002, minVal: 3000, maxVal: 8000, emoji: '🌌', glow: '#ff00ff' }
+        ];
 
-      // Виброотклик для Telegram
-      if (tg && tg.HapticFeedback) {
-        tg.HapticFeedback.impactOccurred('medium');
-      }
+        const POTION_NAMES = {
+            common: ['Слабый Эликсир', 'Травяной Отвар', 'Простая Эссенция', 'Вода Жизни', 'Базовое Зелье'],
+            uncommon: ['Зелье Силы', 'Эликсир Ловкости', 'Отвар Мудрости', 'Зелье Удачи', 'Иscrистая Эссенция'],
+            rare: ['Кровь Дракона', 'Слёзы Феникса', 'Лунный Нектар', 'Звёздная Пыль', 'Эликсир Теней'],
+            epic: ['Сердце Титана', 'Дыхание Левиафана', 'Пепел Архангела', 'Кристалл Хаоса', 'Нектар Богов'],
+            legendary: ['Эликсир Бессмертия', 'Слёзы Создателя', 'Кровь Космоса', 'Сердце Вселенной', 'Первозданный Свет'],
+            mythic: ['Абсолют', 'Код Реальности', 'Семя Хаоса', 'Око Вечности', 'Последний Эликсир']
+        };
 
-      cell.classList.add('dug');
+        const UPGRADES = [
+            { id: 'luck', name: 'Удача Алхимика', desc: '+8% к шансу Rare+', baseCost: 150, level: 0, max: 20, effect: 0.08 },
+            { id: 'speed', name: 'Скорость Варки', desc: 'Быстрее анимация', baseCost: 200, level: 0, max: 10, effect: 0.15 },
+            { id: 'auto', name: 'Авто-Котёл', desc: 'Автоварка (раз в N сек)', baseCost: 2000, level: 0, max: 5, effect: 1 },
+            { id: 'value', name: 'Богатый Отвар', desc: '+15% к цене продажи', baseCost: 300, level: 0, max: 15, effect: 0.15 }
+        ];
 
-      // Выбивание лута с помощью генератора случайных чисел
-      const item = getRandomLoot();
-      cell.innerHTML = item.icon;
-      cell.classList.add(`item-${item.type}`);
+        // State
+        let state = {
+            coins: 50,
+            luckLevel: 0,
+            totalBrews: 0,
+            legendaries: 0,
+            collection: {}, // id -> count
+            upgrades: { luck: 0, speed: 0, auto: 0, value: 0 },
+            lastPotions: [],
+            currentPotion: null,
+            isBrewing: false,
+            brewCountSinceAd: 0
+        };
 
-      // Начисляем монеты и показываем окно
-      coins += item.value;
-      updateUI();
-      showModal(item);
-    }
+        let ysdk = null;
+        let player = null;
 
-    // Алгоритм выбора предмета по шансу
-    function getRandomLoot() {
-      const rand = Math.random();
-      let cumulative = 0;
+        // ================== INIT ==================
+        async function init() {
+            // Bubbles
+            const bubblesEl = document.getElementById('bubbles');
+            for (let i = 0; i < 8; i++) {
+                const b = document.createElement('div');
+                b.className = 'bubble';
+                b.style.left = (10 + Math.random() * 80) + '%';
+                b.style.animationDelay = (Math.random() * 2) + 's';
+                b.style.width = b.style.height = (6 + Math.random() * 10) + 'px';
+                bubblesEl.appendChild(b);
+            }
 
-      for (const item of lootTable) {
-        cumulative += item.chance;
-        if (rand <= cumulative) {
-          return item;
+            // Load local first
+            loadLocal();
+
+            // Yandex SDK
+            try {
+                ysdk = await YaGames.init();
+                console.log('Yandex SDK ready');
+                
+                // Game Ready
+                ysdk.features.LoadingAPI?.ready();
+                
+                // Player data
+                try {
+                    player = await ysdk.getPlayer({ scopes: false });
+                    const data = await player.getData();
+                    if (data && data.gameState) {
+                        Object.assign(state, data.gameState);
+                        console.log('Cloud progress loaded');
+                    }
+                } catch (e) { console.log('Player data skip', e); }
+
+                // Gameplay start
+                ysdk.features.GameplayAPI?.start();
+            } catch (e) {
+                console.log('SDK not available (local mode)', e);
+            }
+
+            updateUI();
+            renderShop();
+            renderCollection();
+            
+            // Hide loading
+            setTimeout(() => {
+                document.getElementById('loading').style.opacity = '0';
+                setTimeout(() => document.getElementById('loading').style.display = 'none', 600);
+            }, 800);
+
+            // Events
+            document.getElementById('brewBtn').onclick = brew;
+            document.getElementById('btnSell').onclick = sellCurrent;
+            document.getElementById('btnKeep').onclick = keepCurrent;
+            document.getElementById('btnDouble').onclick = doubleWithAd;
+            document.getElementById('btnShop').onclick = () => openModal('shopModal');
+            document.getElementById('btnCollection').onclick = () => { renderCollection(); openModal('collectionModal'); };
+            document.getElementById('btnReward').onclick = showRewardedAd;
+
+            document.querySelectorAll('[data-close]').forEach(btn => {
+                btn.onclick = () => closeModal(btn.dataset.close);
+            });
+
+            // Auto brew if upgraded
+            setInterval(autoBrewCheck, 1000);
         }
-      }
-      return lootTable[0];
-    }
 
-    // Обновление показателей UI
-    function updateUI() {
-      document.getElementById('coins').innerText = coins;
-      document.getElementById('energy').innerText = `${energy}/${maxEnergy}`;
-    }
+        function save() {
+            localStorage.setItem('mysticCauldron', JSON.stringify(state));
+            if (player) {
+                player.setData({ gameState: state }).catch(()=>{});
+            }
+        }
 
-    // Показ модального окна находки
-    function showModal(item) {
-      document.getElementById('modal-icon').innerText = item.icon;
-      document.getElementById('modal-title').innerText = item.name;
-      document.getElementById('modal-rarity').innerText = item.rarity;
-      document.getElementById('modal-rarity').style.color = getRarityColor(item.type);
-      document.getElementById('modal-value').innerText = item.value;
-      document.getElementById('modal').style.display = 'flex';
-    }
+        function loadLocal() {
+            try {
+                const s = localStorage.getItem('mysticCauldron');
+                if (s) Object.assign(state, JSON.parse(s));
+            } catch(e){}
+        }
 
-    function closeModal() {
-      document.getElementById('modal').style.display = 'none';
-    }
+        // ================== CORE GAMEPLAY ==================
+        function getAdjustedChances() {
+            const luckBonus = state.upgrades.luck * 0.008; // +0.8% per level to higher tiers
+            let chances = RARITIES.map(r => ({...r}));
+            // Shift probability mass to higher rarities
+            chances[0].chance = Math.max(0.25, 0.55 - luckBonus * 3);
+            chances[1].chance = 0.25 - luckBonus;
+            chances[2].chance = 0.12 + luckBonus * 0.8;
+            chances[3].chance = 0.06 + luckBonus * 1.2;
+            chances[4].chance = 0.018 + luckBonus * 1.5;
+            chances[5].chance = 0.002 + luckBonus * 0.8;
+            // Normalize
+            const sum = chances.reduce((a,c) => a + c.chance, 0);
+            chances.forEach(c => c.chance /= sum);
+            return chances;
+        }
 
-    function getRarityColor(type) {
-      switch(type) {
-        case 'common': return '#a4b0be';
-        case 'rare': return '#1e90ff';
-        case 'epic': return '#a55eea';
-        case 'legendary': return '#ffa502';
-        default: return '#fff';
-      }
-    }
+        function rollPotion() {
+            const chances = getAdjustedChances();
+            let r = Math.random();
+            let cumulative = 0;
+            for (let c of chances) {
+                cumulative += c.chance;
+                if (r <= cumulative) {
+                    const names = POTION_NAMES[c.id];
+                    const name = names[Math.floor(Math.random() * names.length)];
+                    const value = Math.floor(c.minVal + Math.random() * (c.maxVal - c.minVal + 1));
+                    const mult = 1 + state.upgrades.value * 0.15;
+                    return {
+                        ...c,
+                        name,
+                        value: Math.floor(value * mult),
+                        id: c.id + '_' + name.replace(/\s/g, '') + '_' + Date.now()
+                    };
+                }
+            }
+            return chances[0]; // fallback
+        }
 
-    // Перезапуск поля
-    function resetGrid() {
-      energy = maxEnergy;
-      updateUI();
-      initGrid();
-    }
+        function brew() {
+            if (state.isBrewing) return;
+            state.isBrewing = true;
+            document.getElementById('brewBtn').disabled = true;
+            document.getElementById('cauldron').classList.add('brewing');
+            document.getElementById('resultCard').classList.remove('show');
 
-    // Авто-восстановление энергии раз в 10 секунд
-    setInterval(() => {
-      if (energy < maxEnergy) {
-        energy++;
-        updateUI();
-      }
-    }, 10000);
+            // Speed upgrade shortens time
+            const brewTime = Math.max(400, 1100 - state.upgrades.speed * 80);
 
-    // Старт игры
-    initGrid();
-  </script>
+            // Particles during brew
+            spawnBrewParticles();
+
+            setTimeout(() => {
+                const potion = rollPotion();
+                state.currentPotion = potion;
+                state.totalBrews++;
+                state.brewCountSinceAd++;
+                if (potion.id.startsWith('legendary') || potion.id.startsWith('mythic')) state.legendaries++;
+
+                showResult(potion);
+                addToLast(potion);
+                
+                document.getElementById('cauldron').classList.remove('brewing');
+                state.isBrewing = false;
+                document.getElementById('brewBtn').disabled = false;
+
+                // Interstitial every ~14 brews
+                if (state.brewCountSinceAd >= 14) {
+                    state.brewCountSinceAd = 0;
+                    showInterstitial();
+                }
+
+                updateUI();
+                save();
+                
+                // Special effects
+                if (potion.id.includes('legendary') || potion.id.includes('mythic')) {
+                    confetti();
+                    shakeScreen();
+                    showToast('🔥 ' + potion.name.toUpperCase() + '!!!');
+                }
+            }, brewTime);
+        }
+
+        function showResult(p) {
+            const card = document.getElementById('resultCard');
+            card.className = 'result-card show ' + p.id.split('_')[0];
+            
+            document.getElementById('rarityBadge').textContent = p.name.toUpperCase ? p.name : RARITIES.find(r=>p.id.startsWith(r.id))?.name || p.id;
+            document.getElementById('rarityBadge').style.background = p.color;
+            document.getElementById('rarityBadge').style.color = '#000';
+            
+            document.getElementById('potionIcon').textContent = p.emoji;
+            document.getElementById('potionIcon').style.color = p.color;
+            document.getElementById('potionName').textContent = p.name;
+            document.getElementById('potionValue').textContent = `+${p.value} 💰`;
+            
+            document.getElementById('btnDouble').style.display = (p.value > 50) ? 'inline-block' : 'none';
+        }
+
+        function sellCurrent() {
+            if (!state.currentPotion) return;
+            const val = state.currentPotion.value;
+            state.coins += val;
+            spawnFloatingText('+' + val + '💰', '#ffd700');
+            state.currentPotion = null;
+            document.getElementById('resultCard').classList.remove('show');
+            updateUI();
+            save();
+        }
+
+        function keepCurrent() {
+            if (!state.currentPotion) return;
+            const key = state.currentPotion.name; // simple key by name
+            state.collection[key] = (state.collection[key] || 0) + 1;
+            spawnFloatingText('В коллекцию!', '#bf00ff');
+            state.currentPotion = null;
+            document.getElementById('resultCard').classList.remove('show');
+            updateUI();
+            save();
+            renderCollection();
+        }
+
+        function doubleWithAd() {
+            if (!state.currentPotion) return;
+            showRewardedAd(() => {
+                state.currentPotion.value *= 2;
+                document.getElementById('potionValue').textContent = `+${state.currentPotion.value} 💰 (x2)`;
+                showToast('x2 получено!');
+            });
+        }
+
+        // ================== ADS ==================
+        function showInterstitial() {
+            if (!ysdk) return;
+            ysdk.features.GameplayAPI?.stop();
+            ysdk.adv.showFullscreenAdv({
+                callbacks: {
+                    onClose: (wasShown) => {
+                        ysdk.features.GameplayAPI?.start();
+                    },
+                    onError: (e) => {
+                        ysdk.features.GameplayAPI?.start();
+                        console.log('Interstitial error', e);
+                    }
+                }
+            });
+        }
+
+        function showRewardedAd(onReward) {
+            if (!ysdk) {
+                // Local fake
+                if (onReward) onReward();
+                else {
+                    state.coins += 150;
+                    showToast('+150 за "рекламу" (тест)');
+                    updateUI(); save();
+                }
+                return;
+            }
+            ysdk.features.GameplayAPI?.stop();
+            ysdk.adv.showRewardedVideo({
+                callbacks: {
+                    onOpen: () => {},
+                    onRewarded: () => {
+                        if (onReward) onReward();
+                        else {
+                            state.coins += 200;
+                            showToast('🎬 +200 монет за рекламу!');
+                            updateUI(); save();
+                        }
+                    },
+                    onClose: () => {
+                        ysdk.features.GameplayAPI?.start();
+                    },
+                    onError: (e) => {
+                        ysdk.features.GameplayAPI?.start();
+                        showToast('Реклама недоступна');
+                    }
+                }
+            });
+        }
+
+        // ================== UI & SHOP ==================
+        function updateUI() {
+            document.getElementById('coins').textContent = formatNum(state.coins);
+            document.getElementById('luck').textContent = state.upgrades.luck + 1;
+            document.getElementById('totalBrews').textContent = state.totalBrews;
+            document.getElementById('legs').textContent = state.legendaries;
+        }
+
+        function formatNum(n) {
+            if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+            if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
+            return n;
+        }
+
+        function renderShop() {
+            const list = document.getElementById('shopList');
+            list.innerHTML = '';
+            UPGRADES.forEach(u => {
+                const lvl = state.upgrades[u.id] || 0;
+                const cost = Math.floor(u.baseCost * Math.pow(1.45, lvl));
+                const maxed = lvl >= u.max;
+                const div = document.createElement('div');
+                div.className = 'upgrade-item';
+                div.innerHTML = `
+                    <div>
+                        <div style="font-weight:700">${u.name} (ур. ${lvl})</div>
+                        <div style="font-size:12px;opacity:0.7">${u.desc}</div>
+                    </div>
+                    <button ${maxed ? 'disabled' : ''} onclick="buyUpgrade('${u.id}')">
+                        ${maxed ? 'MAX' : cost + '💰'}
+                    </button>
+                `;
+                list.appendChild(div);
+            });
+            
+            // Bonus button
+            const bonus = document.createElement('div');
+            bonus.className = 'upgrade-item';
+            bonus.innerHTML = `
+                <div><div style="font-weight:700">🎁 Ежедневный бонус</div><div style="font-size:12px;opacity:0.7">+100-500 монет</div></div>
+                <button onclick="dailyBonus()">Забрать</button>
+            `;
+            list.appendChild(bonus);
+        }
+
+        window.buyUpgrade = function(id) {
+            const u = UPGRADES.find(x => x.id === id);
+            const lvl = state.upgrades[id] || 0;
+            if (lvl >= u.max) return;
+            const cost = Math.floor(u.baseCost * Math.pow(1.45, lvl));
+            if (state.coins < cost) {
+                showToast('Недостаточно монет!');
+                return;
+            }
+            state.coins -= cost;
+            state.upgrades[id] = lvl + 1;
+            showToast(u.name + ' улучшен!');
+            renderShop();
+            updateUI();
+            save();
+        };
+
+        function dailyBonus() {
+            const last = localStorage.getItem('dailyBonusDate');
+            const today = new Date().toDateString();
+            if (last === today) {
+                showToast('Уже забирал сегодня!');
+                return;
+            }
+            const bonus = 100 + Math.floor(Math.random() * 400);
+            state.coins += bonus;
+            localStorage.setItem('dailyBonusDate', today);
+            showToast('🎁 +' + bonus + ' монет!');
+            updateUI(); save();
+        }
+
+        function renderCollection() {
+            const grid = document.getElementById('collectionGrid');
+            grid.innerHTML = '';
+            let owned = 0;
+            const allNames = [];
+            Object.values(POTION_NAMES).forEach(arr => allNames.push(...arr));
+            
+            // Show owned + some locked
+            const keys = Object.keys(state.collection);
+            owned = keys.length;
+            
+            // Display owned first
+            keys.forEach(name => {
+                const count = state.collection[name];
+                const rarity = Object.entries(POTION_NAMES).find(([k,v]) => v.includes(name))?.[0] || 'common';
+                const r = RARITIES.find(x => x.id === rarity) || RARITIES[0];
+                const div = document.createElement('div');
+                div.className = 'col-item owned';
+                div.style.borderColor = r.color;
+                div.innerHTML = `${r.emoji}<div class="count">x${count}</div>`;
+                div.title = name;
+                grid.appendChild(div);
+            });
+            
+            // Add placeholders for missing (show ~12 empty)
+            for (let i = 0; i < Math.min(12, allNames.length - owned); i++) {
+                const div = document.createElement('div');
+                div.className = 'col-item';
+                div.innerHTML = '❓';
+                grid.appendChild(div);
+            }
+            
+            document.getElementById('colCount').textContent = owned;
+            document.getElementById('colTotal').textContent = allNames.length;
+        }
+
+        function addToLast(p) {
+            state.lastPotions.unshift(p);
+            if (state.lastPotions.length > 8) state.lastPotions.pop();
+            const cont = document.getElementById('lastPotions');
+            cont.innerHTML = '';
+            state.lastPotions.forEach(pp => {
+                const d = document.createElement('div');
+                d.className = 'mini-potion';
+                d.style.borderColor = pp.color;
+                d.textContent = pp.emoji;
+                d.title = pp.name;
+                cont.appendChild(d);
+            });
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('show'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        // ================== EFFECTS ==================
+        function spawnBrewParticles() {
+            const area = document.getElementById('cauldronArea');
+            for (let i = 0; i < 12; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.background = `hsl(${180 + Math.random()*120}, 100%, 60%)`;
+                p.style.left = (40 + Math.random()*40) + '%';
+                p.style.top = '60%';
+                area.appendChild(p);
+                const anim = p.animate([
+                    { transform: 'translate(0,0) scale(1)', opacity: 1 },
+                    { transform: `translate(${(Math.random()-0.5)*100}px, -${80+Math.random()*60}px) scale(0)`, opacity: 0 }
+                ], { duration: 800 + Math.random()*400, easing: 'ease-out' });
+                anim.onfinish = () => p.remove();
+            }
+        }
+
+        function spawnFloatingText(text, color) {
+            const el = document.createElement('div');
+            el.className = 'floating-text';
+            el.textContent = text;
+            el.style.color = color;
+            el.style.left = (40 + Math.random()*20) + '%';
+            el.style.top = '40%';
+            document.getElementById('cauldronArea').appendChild(el);
+            setTimeout(() => el.remove(), 1200);
+        }
+
+        function confetti() {
+            const colors = ['#ffd700', '#ff00ff', '#00f5d4', '#ff6b00', '#bf00ff'];
+            for (let i = 0; i < 40; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.background = colors[Math.floor(Math.random()*colors.length)];
+                p.style.width = p.style.height = (6 + Math.random()*8) + 'px';
+                p.style.left = Math.random()*100 + 'vw';
+                p.style.top = '-10px';
+                p.style.position = 'fixed';
+                document.body.appendChild(p);
+                const anim = p.animate([
+                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                    { transform: `translateY(${window.innerHeight+50}px) rotate(${360+Math.random()*360}deg)`, opacity: 0 }
+                ], { duration: 1500 + Math.random()*1000, easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)' });
+                anim.onfinish = () => p.remove();
+            }
+        }
+
+        function shakeScreen() {
+            document.body.animate([
+                { transform: 'translate(0,0)' },
+                { transform: 'translate(-6px,4px)' },
+                { transform: 'translate(6px,-4px)' },
+                { transform: 'translate(0,0)' }
+            ], { duration: 400, iterations: 2 });
+        }
+
+        function autoBrewCheck() {
+            if (state.upgrades.auto > 0 && !state.isBrewing && !state.currentPotion) {
+                // Simple auto every 8 - level seconds (rough)
+                // For demo we just enable manual mostly
+            }
+        }
+
+        // Start
+        window.onload = init;
+    </script>
 </body>
 </html>
